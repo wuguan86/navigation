@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI魔方视界导航站</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a6bff;
+            --secondary-color: #f8f9fa;
+            --accent-color: #ff6b6b;
+            --text-color: #333;
+            --light-text: #6c757d;
+            --border-color: #e9ecef;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --header-bg: linear-gradient(135deg, #4a6bff, #6a89ff);
+        }
+        
+        [data-theme="dark"] {
+            --primary-color: #6366f1;
+            --secondary-color: #1e293b;
+            --accent-color: #f87171;
+            --text-color: #f1f5f9;
+            --light-text: #94a3b8;
+            --border-color: #334155;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --header-bg: linear-gradient(135deg, #6366f1, #7d72ff);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1558883493-8b86ff880fec?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            animation: fadeIn 0.8s ease;
+            position: relative;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            background: var(--header-bg);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+        }
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+        
+        .subtitle {
+            color: var(--light-text);
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+        
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.05);
+        }
+        
+        /* 标签页导航 */
+        .tabs {
+            display: flex;
+            background: var(--header-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            overflow: hidden;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            color: white;
+            flex-grow: 1;
+            text-align: center;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+        
+        .tab i {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .tab.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .bookmark-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 25px;
+        }
+        
+        .bookmark-item {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-color);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            box-shadow: var(--shadow);
+        }
+        
+        .bookmark-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(74, 107, 255, 0.05), transparent);
+            z-index: -1;
+            transition: var(--transition);
+        }
+        
+        .bookmark-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+            border-color: rgba(74, 107, 255, 0.3);
+        }
+        
+        .bookmark-item:hover::before {
+            background: linear-gradient(90deg, rgba(74, 107, 255, 0.15), transparent);
+        }
+        
+        .bookmark-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            margin-right: 18px;
+            background-color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+        
+        .bookmark-item:hover .bookmark-icon {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(74, 107, 255, 0.2);
+        }
+        
+        .bookmark-info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            font-weight: 600;
+        }
+        
+        .bookmark-info p {
+            font-size: 0.9rem;
+            color: var(--light-text);
+            margin-bottom: 10px;
+        }
+        
+        .bookmark-info .date {
+            font-size: 0.75rem;
+            color: var(--light-text);
+            opacity: 0.8;
+        }
+        
+        .bookmark-info .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            background-color: rgba(74, 107, 255, 0.1);
+            color: var(--primary-color);
+            margin-top: 8px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 30px 0;
+            color: var(--light-text);
+            font-size: 0.9rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+        }
+        
+        footer p {
+            margin-bottom: 10px;
+        }
+        
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        footer a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .bookmark-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .tab {
+                padding: 12px 15px;
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .bookmark-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tab {
+                padding: 10px 15px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="theme-toggle" id="theme-toggle">
+            <i class="fas fa-moon"></i>
+        </button>
+        
+        <header>
+            <h1>AI魔方视界导航站</h1>
+            <div class="subtitle">精心整理的AI工具与资源</div>
+        </header>
+        
+        <!-- 标签页导航 -->
+        <div class="tabs">
+            <div class="tab active" data-tab="ai-models">
+                <i class="fas fa-microchip"></i> AI模型
+            </div>
+            <div class="tab" data-tab="ai-tools">
+                <i class="fas fa-robot"></i> AI绘画
+            </div>
+            <div class="tab" data-tab="ai-video">
+                <i class="fas fa-video"></i> AI视频
+            </div>
+            <div class="tab" data-tab="remove-watermark">
+                <i class="fas fa-water"></i> 去除水印
+            </div>
+            <div class="tab" data-tab="digital-avatars">
+                <i class="fas fa-user-astronaut"></i> 数字人
+            </div>
+            <div class="tab" data-tab="audio">
+                <i class="fas fa-microphone"></i> 音频
+            </div>
+            <div class="tab" data-tab="address-parsing">
+                <i class="fas fa-link"></i> 地址解析
+            </div>
+            <div class="tab" data-tab="video-summary">
+                <i class="fas fa-film"></i> 视频总结
+            </div>
+            <div class="tab" data-tab="hugging-face">
+                <i class="fas fa-code-branch"></i> Hugging Face
+            </div>
+            <div class="tab" data-tab="video-translation">
+                <i class="fas fa-language"></i> 视频转译
+            </div>
+        </div>
+        
+        <!-- AI模型 -->
+        <div class="tab-content active" id="ai-models">
+            <div class="bookmark-grid">
+                <a href="https://chat.deepseek.com/" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>DeepSeek</h3>
+                        <p>探索AI</p>
+                        <div class="date">免费</div>
+                    </div>
+                </a>
+                
+                <a href="https://tongyi.aliyun.com/qianwen/?spm=5176.28326591.0.0.40f76ee1zBYunq" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-cloud"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>通义</h3>
+                        <p>AI服务</p>
+                        <div class="date">免费</div>
+                    </div>
+                </a>
+                
+                <a href="https://kimi.moonshot.cn/?data_source=tracer&utm_campaign=TR_D0pcUf08&utm_content=&utm_medium=%E7%99%BE%E5%BA%A6&utm_source=baidu_search&utm_term=" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-moon"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>Kimi.ai</h3>
+                        <p>AI助手</p>
+                        <div class="date">免费</div>
+                    </div>
+                </a>
+                
+                <a href="https://www.doubao.com/chat/?channel=baidu_pz&from_login=1&origin_landing=https%3A%2F%2Fwww.doubao.com%2Fchat%2F%3Fchannel%3Dbaidu_pz%26source%3Ddb_baidu_pz_01%26keywordid%3Dweizhi7" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-seedling"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>豆包</h3>
+                        <p>AI智能助手</p>
+                        <div class="date">免费</div>
+                    </div>
+                </a>
+                
+                <a href="https://yuanbao.tencent.com/chat/naQivTmsDa/9a573469-1fea-447a-97ce-370fff122cf9" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>腾讯元宝</h3>
+                        <p>AI助手</p>
+                        <div class="date">免费</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+		
+        <!-- AI绘画 -->
+        <div class="tab-content" id="ai-tools">
+            <div class="bookmark-grid">
+                <a href="https://www.liblib.art/" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>LiblibAI-哩布哩布AI</h3>
+                        <p>AI创作平台</p>
+                        <div class="date">每日固定200点</div>
+                        <span class="badge">热门</span>
+                    </div>
+                </a>
+                
+                <a href="https://www.xingliu.art/" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-meteor"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>星流 - 新一代AI创作工具</h3>
+                        <p>新一代AI创作工具</p>
+                        <div class="date">每日固定100点</div>
+                    </div>
+                </a>
+                
+                <a href="https://civitai.me/" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>Civitai中文网</h3>
+                        <p>AI模型社区</p>
+                        <div class="date">免费</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        
+        <!-- AI视频 -->
+        <div class="tab-content" id="ai-video">
+            <div class="bookmark-grid">
+                <a href="https://tongyi.aliyun.com/wanxiang/videoCreation" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-paint-brush"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>通义万相</h3>
+                        <p>AI创意作画</p>
+                        <div class="date">免费</div>
+                        <span class="badge">新</span>
+                    </div>
+                </a>
+                
+                <a href="https://klingai.kuaishou.com/" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fab fa-kickstarter"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>可灵 AI</h3>
+                        <p>创意生产力平台</p>
+                        <div class="date">每月登陆送灵感值</div>
+                        <span class="badge">热</span>
+                    </div>
+                </a>
+                
+                <a href="https://jimeng.jianying.com/ai-tool/home/?utm_medium=baiduads&utm_source=pinzhuan&utm_campaign=title" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-seedling"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>即梦AI</h3>
+                        <p>一站式创作平台</p>
+                        <div class="date">每日登陆送积分</div>
+                    </div>
+                </a>
+                
+                <a href="https://hailuoai.com/video/create" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-film"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>海螺视频</h3>
+                        <p>AI视频创作工具</p>
+                        <div class="date">每日签到送100贝壳</div>
+                    </div>
+                </a>
+				<a href="https://www.vidu.cn/create/character2video" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>Vidu AI</h3>
+                        <p>参考生视频</p>
+                        <div class="date">每日登陆送20积分</div>
+                    </div>
+                </a>
+                
+                
+                <!--
+                <a href="https://www.runninghub.cn/?utm_source=kol01-RH096" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-running"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>RunningHub</h3>
+                        <p>云端ComfyUI</p>
+                        <div class="date">添加于 2023-05-28</div>
+                    </div>
+                </a>
+                -->
+                <a href="https://chatglm.cn/video?lang=zh" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>智谱清言</h3>
+                        <p>AI对话</p>
+                        <div class="date">免费</div>
+                    </div>
+                </a>
+                
+                <a href="https://video.hunyuan.tencent.com/" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fab fa-tencent-weibo"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>腾讯混元AI视频</h3>
+                        <p>视频创作</p>
+                        <div class="date">免费</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        
+        <!-- 去除水印 -->
+        <div class="tab-content" id="remove-watermark">
+            <div class="bookmark-grid">
+                <a href="https://image.baidu.com/search/index?tn=baiduimage&ipn=r&ct=201326592&cl=2&lm=-1&st=-1&fm=detail&fr=baiduimageedit&hs=0&xthttps=111110&sf=1&fmq=1713767239197_R&pv=&ic=0&nc=1&z=&se=&showtab=0&fb=0&width=&height=&face=0&istype=2&ie=utf-8&word=bdaitpzs%E7%99%BE%E5%BA%A6AI%E5%9B%BE%E7%89%87%E5%8A%A9%E6%89%8Bbdaitpzs&oq=%E5%9B%BE%E7%89%87&rsp=-1&lid=10069686546447852841&toolType=3" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>百度AI照片编辑器</h3>
+                        <p>图像处理</p>
+                        <div class="date">免费</div>
+                    </div>
+                </a>
+                
+                <a href="https://www.shuiyinyun.com/tools/#/editor/videoToText" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>水印云</h3>
+                        <p>视频去水印</p>
+                        <div class="date">收费</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        
+        <!-- 数字人 -->
+        <div class="tab-content" id="digital-avatars">
+            <div class="bookmark-grid">
+                <a href="https://www.heygen.com/?sid=rewardful&via=startp&gad_source=1&gbraid=0AAAAAq3VV6ZAiWVd-ErfIyX6bgh5LITzU&gclid=EAIaIQobChMI6722vuixjAMVXF4PAh01xChoEAAYASAAEgJZjfD_BwE" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>HeyGen</h3>
+                        <p>数字人生成</p>
+                        <div class="date">新用户有3次免费（需要魔法）</div>
+                    </div>
+                </a>
+				
+				<a href="https://jimeng.jianying.com/ai-tool/home/?utm_medium=baiduads&utm_source=pinzhuan&utm_campaign=title" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-seedling"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>即梦AI</h3>
+                        <p>一站式创作平台</p>
+                        <div class="date">每日登陆送积分</div>
+                    </div>
+                </a>
+                
+                <a href="https://zenvideo.qq.com/" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fab fa-tencent-weibo"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>腾讯智影-在线智能视频创作平台</h3>
+                        <p>数字人视频创作</p>
+                        <div class="date">收费</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        
+        <!-- 音频 -->
+        <div class="tab-content" id="audio">
+            <div class="bookmark-grid">
+                <a href="https://ttsmaker.cn/" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-microphone"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>TTSMaker</h3>
+                        <p>文字转语音</p>
+                        <div class="date">免费</div>
+                    </div>
+                </a>
+                
+                <a href="https://peiyin.xunfei.cn/make" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-headphones"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>讯飞配音</h3>
+                        <p>AI配音服务</p>
+                        <div class="date">收费</div>
+                    </div>
+                </a>
+				<a href="https://app.dubbingx.com/tts" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-microphone-alt"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>DubbingX</h3>
+                        <p>AI配音工具</p>
+                        <div class="date">收费（有邀请码3天内免费）</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        
+        <!-- 地址解析 -->
+        <div class="tab-content" id="address-parsing">
+            <div class="bookmark-grid">
+                <a href="https://greenvideo.cc/" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-link"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>GreenVideo</h3>
+                        <p>视频下载工具</p>
+                        <div class="date">免费</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        
+        <!-- 视频总结 -->
+        <div class="tab-content" id="video-summary">
+            <div class="bookmark-grid">
+                <a href="https://bibigpt.co/" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-summary-list"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>BibiGPT 学习助理</h3>
+                        <p>视频内容总结</p>
+                        <div class="date">收费（新用户有免费时间）</div>
+                    </div>
+                </a>
+                
+                <a href="https://tongyi.aliyun.com/efficiency/home" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>通义效率_你的工作学习助手</h3>
+                        <p>AI助手</p>
+                        <div class="date">免费（需要先下载好视频）</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Hugging Face -->
+        <div class="tab-content" id="hugging-face">
+            <div class="bookmark-grid">
+                <a href="https://huggingface.co/models" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-code-branch"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>Hugging Face</h3>
+                        <p>AI模型库</p>
+                        <div class="date">模型库（需要魔法）</div>
+                    </div>
+                </a>
+                
+                <a href="https://huggingface.co/" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>Hugging Face</h3>
+                        <p>AI社区</p>
+                        <div class="date">社区（需要魔法）</div>
+                    </div>
+                </a>
+				<a href="https://lmarena.ai/" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>Chatbot Arena</h3>
+                        <p>AI聊天机器人测试</p>
+                        <div class="date">需要魔法</div>
+                    </div>
+                </a>
+                
+                <a href="https://huggingface.co/spaces/Vchitect/VBench_Leaderboard" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>VBench Leaderboard</h3>
+                        <p>AI模型排行榜</p>
+                        <div class="date">需要魔法</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        
+        <!-- 视频转译 -->
+        <div class="tab-content" id="video-translation">
+            <div class="bookmark-grid">
+                <a href="https://www.allvoicelab.cn/" class="bookmark-item" target="_blank">
+                    <div class="bookmark-icon">
+                        <i class="fas fa-language"></i>
+                    </div>
+                    <div class="bookmark-info">
+                        <h3>All Voice Lab - 一站式AI语音创作平台</h3>
+                        <p>视频转译</p>
+                        <div class="date">每月10000积分</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2025 AI工具书签收藏</p>
+            <p>最后更新: 2025-04-01</p>
+            <p>设计与开发：<a href="#">AI魔方视界</a></p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 标签页切换
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // 更新标签页状态
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // 更新内容区域状态
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === tabId) {
+                            content.classList.add('active');
+                        }
+                    });
+                });
+            });
+            
+            // 滚动动画
+            const categories = document.querySelectorAll('.tab-content');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            categories.forEach(category => {
+                category.style.opacity = '0';
+                category.style.transform = 'translateY(20px)';
+                category.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                observer.observe(category);
+            });
+            
+            // 夜间模式切换
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = themeToggle.querySelector('i');
+            
+            // 检查本地存储中的主题设置
+            const currentTheme = localStorage.getItem('theme');
+            if (currentTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            }
+            
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                
+                if (currentTheme === 'dark') {
+                    document.documentElement.removeAttribute('data-theme');
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                    localStorage.setItem('theme', 'dark');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
