@@ -4,895 +4,813 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI魔方视界导航站</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Basic Reset & Root Variables */
         :root {
-            --primary-color: #4a6bff;
-            --secondary-color: #f8f9fa;
-            --accent-color: #ff6b6b;
-            --text-color: #333;
-            --light-text: #6c757d;
-            --border-color: #e9ecef;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --bg-color: #f0f2f5;
-            --card-bg: #ffffff;
-            --header-bg: linear-gradient(135deg, #4a6bff, #6a89ff);
+            /* Light Mode */
+            --bg-color-light: #eef1f5; /* Fallback if image fails */
+            --text-color-light: #333;
+            --text-secondary-light: #666;
+            --title-color-light: #4a69bd; /* Adjusted blue */
+            --container-bg-light: rgba(255, 255, 255, 0.85);
+            --nav-bg-light: #4a69bd; /* Adjusted blue */
+            --nav-text-light: #ffffff;
+            --nav-hover-bg-light: rgba(255, 255, 255, 0.2);
+            --nav-active-bg-light: rgba(255, 255, 255, 0.3);
+            --card-bg-light: #ffffff;
+            --card-shadow-light: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --link-color-light: #4a69bd;
+            --footer-text-light: #888;
+            --switch-bg-light: #ccc;
+            --switch-knob-light: #fff;
+            --backdrop-blur-light: blur(8px);
+            --scrollbar-thumb-light: rgba(0, 0, 0, 0.2);
+            --scrollbar-track-light: rgba(0, 0, 0, 0.05);
+
+
+            /* Dark Mode */
+            --bg-color-dark: #1a1a1a; /* Fallback */
+            --text-color-dark: #e0e0e0;
+            --text-secondary-dark: #a0a0a0;
+            --title-color-dark: #87a1e0; /* Lighter blue for dark */
+            --container-bg-dark: rgba(40, 42, 54, 0.85); /* Dracula-ish dark */
+            --nav-bg-dark: #3b508a; /* Darker blue */
+            --nav-text-dark: #f0f0f0;
+            --nav-hover-bg-dark: rgba(255, 255, 255, 0.1);
+            --nav-active-bg-dark: rgba(255, 255, 255, 0.15);
+            --card-bg-dark: #282a36; /* Dracula bg */
+            --card-shadow-dark: 0 4px 15px rgba(0, 0, 0, 0.3);
+            --link-color-dark: #87a1e0;
+            --footer-text-dark: #777;
+            --switch-bg-dark: #555;
+            --switch-knob-dark: #ccc;
+            --backdrop-blur-dark: blur(10px);
+            --scrollbar-thumb-dark: rgba(255, 255, 255, 0.2);
+            --scrollbar-track-dark: rgba(255, 255, 255, 0.05);
+
+
+            /* Default Assignments (Light) */
+            --bg-color: var(--bg-color-light);
+            --text-color: var(--text-color-light);
+            --text-secondary: var(--text-secondary-light);
+            --title-color: var(--title-color-light);
+            --container-bg: var(--container-bg-light);
+            --nav-bg: var(--nav-bg-light);
+            --nav-text: var(--nav-text-light);
+            --nav-hover-bg: var(--nav-hover-bg-light);
+            --nav-active-bg: var(--nav-active-bg-light);
+            --card-bg: var(--card-bg-light);
+            --card-shadow: var(--card-shadow-light);
+            --link-color: var(--link-color-light);
+            --footer-text: var(--footer-text-light);
+            --switch-bg: var(--switch-bg-light);
+            --switch-knob: var(--switch-knob-light);
+            --backdrop-blur: var(--backdrop-blur-light);
+            --scrollbar-thumb: var(--scrollbar-thumb-light);
+            --scrollbar-track: var(--scrollbar-track-light);
+
+             /* Define fixed height for content area */
+             --content-panel-height: 50vh; /* Example: 50% of viewport height */
+             /* Or use a pixel value: --content-panel-height: 450px; */
         }
-        
-        [data-theme="dark"] {
-            --primary-color: #6366f1;
-            --secondary-color: #1e293b;
-            --accent-color: #f87171;
-            --text-color: #f1f5f9;
-            --light-text: #94a3b8;
-            --border-color: #334155;
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --header-bg: linear-gradient(135deg, #6366f1, #7d72ff);
+
+        body.dark-mode {
+            --bg-color: var(--bg-color-dark);
+            --text-color: var(--text-color-dark);
+            --text-secondary: var(--text-secondary-dark);
+            --title-color: var(--title-color-dark);
+            --container-bg: var(--container-bg-dark);
+            --nav-bg: var(--nav-bg-dark);
+            --nav-text: var(--nav-text-dark);
+            --nav-hover-bg: var(--nav-hover-bg-dark);
+            --nav-active-bg: var(--nav-active-bg-dark);
+            --card-bg: var(--card-bg-dark);
+            --card-shadow: var(--card-shadow-dark);
+            --link-color: var(--link-color-dark);
+            --footer-text: var(--footer-text-dark);
+            --switch-bg: var(--switch-bg-dark);
+            --switch-knob: var(--switch-knob-dark);
+            --backdrop-blur: var(--backdrop-blur-dark);
+             --scrollbar-thumb: var(--scrollbar-thumb-dark);
+             --scrollbar-track: var(--scrollbar-track-dark);
         }
-        
+
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
         }
-        
+
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
             line-height: 1.6;
-            padding: 20px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-        
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('https://images.unsplash.com/photo-1558883493-8b86ff880fec?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+            background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'); /* Example background */
             background-size: cover;
-            background-position: center;
+            background-position: center center;
             background-attachment: fixed;
-            z-index: -1;
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex; /* For centering container */
+            align-items: center; /* For centering container */
+            justify-content: center; /* For centering container */
+             transition: background-color 0.3s, color 0.3s;
         }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
+
+        .main-container {
             width: 100%;
-            flex: 1;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 20px;
+            max-width: 1280px;
+            background-color: var(--container-bg);
+            border-radius: 15px;
             padding: 30px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden; /* Needed for potential absolute elements inside */
+            backdrop-filter: var(--backdrop-blur);
+            -webkit-backdrop-filter: var(--backdrop-blur); /* Safari support */
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
+            transition: background-color 0.3s;
+            display: flex;
+            flex-direction: column;
+            /* Let the container grow/shrink, but control content panel height */
         }
-        
+
         header {
             text-align: center;
-            margin-bottom: 30px;
-            padding: 20px 0;
-            animation: fadeIn 0.8s ease;
-            position: relative;
+            margin-bottom: 25px;
+            flex-shrink: 0; /* Prevent header from shrinking */
         }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--title-color);
+            margin-bottom: 5px;
+             transition: color 0.3s;
         }
-        
-        h1 {
-            color: var(--primary-color);
-            font-size: 2.8rem;
-            margin-bottom: 10px;
-            background: var(--header-bg);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 700;
-            position: relative;
-            display: inline-block;
+
+        header p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+             transition: color 0.3s;
         }
-        
-        h1::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 50px;
-            height: 3px;
-            background: var(--primary-color);
-            border-radius: 3px;
-        }
-        
-        .subtitle {
-            color: var(--light-text);
-            font-size: 1.1rem;
-            margin-bottom: 20px;
-        }
-        
-        .theme-toggle {
+
+        /* Theme Switch */
+        .theme-switch-wrapper {
             position: absolute;
             top: 20px;
             right: 20px;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: center;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
+            background-color: rgba(128, 128, 128, 0.1);
+            padding: 5px 8px;
+            border-radius: 20px;
+             z-index: 10; /* Ensure it's above nav */
         }
-        
-        .theme-toggle:hover {
-            transform: scale(1.05);
+        .theme-switch-wrapper label {
+             font-size: 0.8rem;
+             color: var(--text-secondary);
+             margin-right: 5px;
+             cursor: pointer;
         }
-        
-        /* 标签页导航 */
-        .tabs {
-            display: flex;
-            background: var(--header-bg);
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-            margin-bottom: 30px;
-            overflow: hidden;
-            flex-wrap: wrap;
-        }
-        
-        .tab {
-            padding: 15px 25px;
-            cursor: pointer;
-            transition: var(--transition);
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            color: white;
-            flex-grow: 1;
-            text-align: center;
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        .theme-switch {
+            display: inline-block;
+            height: 20px; /* Smaller */
             position: relative;
+            width: 40px; /* Smaller */
         }
-        
-        .tab i {
-            margin-right: 10px;
-            font-size: 1.1rem;
+        .theme-switch input { display:none; }
+        .slider {
+            background-color: var(--switch-bg);
+            bottom: 0; cursor: pointer; left: 0; position: absolute; right: 0; top: 0; transition: .4s; border-radius: 20px;
         }
-        
-        .tab.active {
-            background-color: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        .slider:before {
+            background-color: var(--switch-knob);
+            bottom: 2px; content: ""; height: 16px; left: 2px; position: absolute; transition: .4s; width: 16px; border-radius: 50%;
         }
-        
-        .tab:hover:not(.active) {
-            background-color: rgba(255, 255, 255, 0.05);
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        .bookmark-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            padding: 25px;
-        }
-        
-        .bookmark-item {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
-            transition: var(--transition);
-            border: 1px solid var(--border-color);
+        input:checked + .slider { background-color: var(--link-color); }
+        input:checked + .slider:before { transform: translateX(20px); } /* Adjusted translation */
+
+        /* Category Navigation */
+        .category-nav {
+            background-color: var(--nav-bg);
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 25px;
             display: flex;
+            flex-wrap: wrap;
+            gap: 10px 15px; /* Row gap, column gap */
+            justify-content: flex-start; /* Align items to start */
+             transition: background-color 0.3s;
+             flex-shrink: 0; /* Prevent nav bar from shrinking */
+             /* Removed max-height, let it wrap naturally */
+        }
+
+        .category-button {
+            color: var(--nav-text);
+            background-color: transparent;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            display: inline-flex; /* Use inline-flex */
             align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: background-color 0.2s ease-in-out, color 0.2s;
+            white-space: nowrap; /* Prevent wrapping */
+        }
+
+        .category-button:hover {
+            background-color: var(--nav-hover-bg);
+        }
+
+        .category-button.active {
+            background-color: var(--nav-active-bg);
+            font-weight: 600;
+        }
+
+        .category-button img.cat-icon {
+            width: 18px;
+            height: 18px;
+            filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(150%) contrast(100%); /* Make icons white */
+        }
+         body.dark-mode .category-button img.cat-icon {
+             /* Slightly adjusted filter for dark mode if needed, current white might be fine */
+             filter: invert(90%) sepia(10%) saturate(100%) hue-rotate(180deg) brightness(100%) contrast(90%);
+        }
+
+        /* Content Area */
+        .content-panels {
+             height: var(--content-panel-height); /* FIXED HEIGHT */
+             overflow-y: auto; /* Enable vertical scroll within this container */
+             padding: 10px 5px 10px 0; /* Add padding, especially right for scrollbar */
+             position: relative; /* Needed for absolute positioning if required */
+             flex-grow: 1; /* Allow it to take remaining space if needed, but height is fixed */
+        }
+        /* Custom Scrollbar for content panels */
+        .content-panels::-webkit-scrollbar {
+            width: 8px;
+        }
+        .content-panels::-webkit-scrollbar-track {
+            background: var(--scrollbar-track);
+            border-radius: 4px;
+        }
+        .content-panels::-webkit-scrollbar-thumb {
+            background-color: var(--scrollbar-thumb);
+            border-radius: 4px;
+        }
+        .content-panels::-webkit-scrollbar-thumb:hover {
+            background-color: var(--link-color); /* Use link color on hover */
+        }
+
+
+        .content-panels .panel {
+             display: none; /* Hide panels by default */
+             /* padding-top: 10px;  Removed top padding, applied to parent */
+        }
+        .content-panels .panel.active {
+             display: block; /* Show active panel */
+        }
+
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Smaller minmax for more cards */
+            gap: 20px;
+            padding-right: 10px; /* Ensure content doesn't touch scrollbar */
+        }
+
+        .link-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 18px; /* Slightly adjusted padding */
+            box-shadow: var(--card-shadow);
+            display: flex;
+            align-items: center; /* Align items vertically center */
             text-decoration: none;
             color: var(--text-color);
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
-            box-shadow: var(--shadow);
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, background-color 0.3s;
+            overflow: hidden; /* Prevent content spill */
         }
-        
-        .bookmark-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, rgba(74, 107, 255, 0.05), transparent);
-            z-index: -1;
-            transition: var(--transition);
+
+        .link-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
         }
-        
-        .bookmark-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
-            border-color: rgba(74, 107, 255, 0.3);
+         body.dark-mode .link-card:hover {
+             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+         }
+
+        .card-icon-container {
+             flex-shrink: 0;
+             margin-right: 15px; /* Space between icon and text */
+             width: 32px; /* Fixed container size */
+             height: 32px;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             border-radius: 6px; /* Optional rounding for icon bg */
         }
-        
-        .bookmark-item:hover::before {
-            background: linear-gradient(90deg, rgba(74, 107, 255, 0.15), transparent);
+
+        .card-icon {
+            width: 24px; /* Max icon size */
+            height: 24px;
+            object-fit: contain; /* Prevent distortion */
+            image-rendering: pixelated;
+            border-radius: 4px; /* Slight rounding for the icon itself */
         }
-        
-        .bookmark-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            margin-right: 18px;
-            background-color: var(--secondary-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: var(--primary-color);
-            flex-shrink: 0;
-            transition: var(--transition);
+
+        .card-icon-default { /* For the span fallback */
+             display: inline-block;
+             width: 24px;
+             height: 24px;
+             background-color: #eee;
+             border: 1px solid #ccc;
+             border-radius: 5px;
+             position: relative;
+             background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iIzg4OCIgY2xhc3M9ImJpIGJpLWxpbmsiIHZpZXdCb3g9IjAgMCAxNiAxNiI+CiAgPHBhdGggZD0iTTYuMzUyIDEwLjcxQzcuMzQgMTIuMzE2IDkuNDYgMTQuMCAxMiAxNC4wYTMuNSAzLjUgMCAxIDAtMi40NTUtMS40NjJBLjI1My4yNTMgMCAwIDEgOS4wNDIgMTIuNUM4LjYzIDEyLjcyMiA4LjQ3IDEzIDguNTA0IDEzLjVhMi41IDIgLjUgMCAxIDEgMy4xNzctLjgwM2wtMS41NTgtMS41NThhLjUuNSAwIDAgMSAuNzAyLS43MDJsMyAzYS41LjUgMCAwIDEgMCAuNzA3bC0zIDNhLjUuNSAwIDEgMS0uNzAyLS43MDJsMS41NTgtMS41NThhMi41IDIuNSAwIDAgMS0uNDkzLTMuNDc1QzEwLjMgNC40OCA4LjQ3IDQgNi41IDRhMy41IDMuNSAwIDEgMC0xLjQ3NSA1LjM3MmEuMjU0LjI1NCAwIDAgMS0uMzE2LjMxNkExLjUgMS41IDAgMSAxIDYuMzUyIDEwLjcxem0yLjE4MyA0LjU1M2ExLjUgMS41IDAgMSAxIDEuOTE4LTEuNTgybC0xLjkzNSAxLjkwNGMuNDYzLjI3Ni45NzMuNDUgMS41MS41NjlhMi41IDIuNSAwIDAgMCAxLjY0LS4zMDVsMS41NTggMS41NThhLjUuNSAwIDAgMCAuNzAyLS43MDJsLTMtM2EuNS41IDAgMCAwLS43MDIgMGwtMyAzYS41LjUgMCAxIDAgLjcwMi43MDJ6Ii8+Cjwvc3ZnPg==');
+             background-size: 14px 14px;
+             background-repeat: no-repeat;
+             background-position: center center;
+             flex-shrink: 0; /* Prevent shrinking */
         }
-        
-        .bookmark-item:hover .bookmark-icon {
-            transform: scale(1.05);
-            box-shadow: 0 0 10px rgba(74, 107, 255, 0.2);
+        body.dark-mode .card-icon-default {
+             background-color: #555;
+             border-color: #777;
+             background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iI2JiYiIgY2xhc3M9ImJpIGJpLWxpbmsiIHZpZXdCb3g9IjAgMCAxNiAxNiI+CiAgPHBhdGggZD0iTTYuMzUyIDEwLjcxQzcuMzQgMTIuMzE2IDkuNDYgMTQuMCAxMiAxNC4wYTMuNSAzLjUgMCAxIDAtMi40NTUtMS40NjJBLjI1My4yNTMgMCAwIDEgOS4wNDIgMTIuNUM4LjYzIDEyLjcyMiA4LjQ3IDEzIDguNTA0IDEzLjVhMi41IDIgLjUgMCAxIDEgMy4xNzctLjgwM2wtMS41NTgtMS41NThhLjUuNSAwIDAgMSAuNzAyLS43MDJsMyAzYS41LjUgMCAwIDEgMCAuNzA3bC0zIDNhLjUuNSAwIDEgMS0uNzAyLS43MDJsMS41NTgtMS41NThhMi41IDIuNSAwIDAgMS0uNDkzLTMuNDc1QzEwLjMgNC40OCA4LjQ3IDQgNi41IDRhMy41IDMuNSAwIDEgMC0xLjQ3NSA1LjM3MmEuMjU0LjI1NCAwIDAgMS0uMzE2LjMxNkExLjUgMS41IDAgMSAxIDYuMzUyIDEwLjcxem0yLjE4MyA0LjU1M2ExLjUgMS41IDAgMSAxIDEuOTE4LTEuNTgybC0xLjkzNSAxLjkwNGMuNDYzLjI3Ni45NzMuNDUgMS41MS41NjlhMi41IDIuNSAwIDAgMCAxLjY0LS4zMDVsMS41NTggMS41NThhLjUuNSAwIDAgMCAuNzAyLS43MDJsLTMtM2EuNS41IDAgMCAwLS43MDIgMGwtMyAzYS41LjUgMCAxIDAgLjcwMi43MDJ6Ii8+Cjwvc3ZnPg==');
         }
-        
-        .bookmark-info h3 {
-            font-size: 1.1rem;
-            margin-bottom: 8px;
-            color: var(--text-color);
+
+
+        .card-text-content {
+            flex-grow: 1;
+            min-width: 0; /* Prevent text overflow issues in flex item */
+        }
+
+        .card-title {
+            font-size: 1rem; /* Adjusted size */
             font-weight: 600;
+            margin-bottom: 3px;
+            color: var(--text-color);
+            word-break: break-word;
+             transition: color 0.3s;
+             display: block; /* Ensure title takes full width before description */
         }
-        
-        .bookmark-info p {
-            font-size: 0.9rem;
-            color: var(--light-text);
-            margin-bottom: 10px;
+
+        .card-description {
+            font-size: 0.8rem; /* Adjusted size */
+            color: var(--text-secondary);
+            word-break: break-word;
+             transition: color 0.3s;
         }
-        
-        .bookmark-info .date {
-            font-size: 0.75rem;
-            color: var(--light-text);
-            opacity: 0.8;
-        }
-        
-        .bookmark-info .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            background-color: rgba(74, 107, 255, 0.1);
-            color: var(--primary-color);
-            margin-top: 8px;
-        }
-        
+
+        /* Footer */
         footer {
             text-align: center;
-            margin-top: 60px;
-            padding: 30px 0;
-            color: var(--light-text);
-            font-size: 0.9rem;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(128, 128, 128, 0.2);
+            font-size: 0.85rem; /* Slightly smaller */
+            color: var(--footer-text);
+             transition: color 0.3s;
+            flex-shrink: 0; /* Prevent footer from shrinking */
         }
-        
-        footer p {
-            margin-bottom: 10px;
-        }
-        
         footer a {
-            color: var(--primary-color);
+            color: var(--link-color);
             text-decoration: none;
+             transition: color 0.3s;
         }
-        
         footer a:hover {
             text-decoration: underline;
         }
-        
+
+        /* Responsive */
+        @media (max-width: 992px) {
+             .content-grid {
+                 grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+             }
+             /* Adjust content panel height on medium screens if needed */
+             /* :root { --content-panel-height: 45vh; } */
+        }
         @media (max-width: 768px) {
-            .bookmark-grid {
-                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+             body {
+                 padding: 10px;
+                 align-items: flex-start; /* Align container to top */
+             }
+            .main-container {
+                padding: 20px;
+                 max-height: 95vh; /* Limit overall height on small screens */
+                 overflow: hidden; /* Prevent body scroll */
             }
-            
-            h1 {
-                font-size: 2.2rem;
+            header h1 { font-size: 1.8rem; }
+            header p { font-size: 0.9rem; }
+            .category-nav {
+                 padding: 8px;
+                 gap: 5px; /* Reduce gap slightly */
+                 /* Removed max-height and overflow-y */
             }
-            
-            .tab {
-                padding: 12px 15px;
-                font-size: 0.9rem;
-            }
+            .category-button { font-size: 0.85rem; padding: 6px 10px; }
+             .content-grid {
+                 gap: 15px;
+             }
+             .link-card { padding: 15px; }
+             .card-title { font-size: 0.95rem; }
+             .card-description { font-size: 0.75rem; }
+             .theme-switch-wrapper { top: 15px; right: 15px; }
+             footer { font-size: 0.8rem; }
+             /* Adjust fixed height on smaller screens */
+             /* :root { --content-panel-height: 40vh; } */
         }
-        
-        @media (max-width: 576px) {
-            .bookmark-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .tab {
-                padding: 10px 15px;
-                font-size: 0.8rem;
-            }
-        }
+         @media (max-width: 480px) {
+             header h1 { font-size: 1.5rem; }
+             .category-nav {
+                justify-content: flex-start;
+                overflow-x: auto; /* Enable horizontal scroll only on very small screens */
+                flex-wrap: nowrap; /* Prevent wrapping when horizontal scroll is active */
+                max-height: 50px; /* Ensure single row height */
+                padding-bottom: 10px; /* Space for scrollbar */
+                /* Remove vertical scrollbar styling if using horizontal */
+                 scrollbar-width: thin; /* Firefox */
+                 scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); /* Firefox */
+             }
+             .category-nav::-webkit-scrollbar {
+                 height: 6px; /* Height for horizontal scrollbar */
+                 width: auto;
+             }
+             .category-button { flex-shrink: 0; } /* Prevent shrinking */
+              .content-grid {
+                 grid-template-columns: 1fr; /* Single column */
+             }
+             .link-card {
+                 flex-direction: row; /* Keep as row even on smallest */
+                 text-align: left;
+             }
+             .card-icon-container { margin-right: 10px; }
+             .theme-switch-wrapper { top: 10px; right: 10px; }
+             footer { margin-top: 20px; padding-top: 15px;}
+             /* Further adjust fixed height */
+             /* :root { --content-panel-height: 50vh; } Adjust as needed for very small */
+         }
+
     </style>
 </head>
 <body>
-    <div class="container">
-        <button class="theme-toggle" id="theme-toggle">
-            <i class="fas fa-moon"></i>
-        </button>
-        
+
+    <div class="main-container">
+
+        <div class="theme-switch-wrapper">
+            <label for="checkbox">Dark:</label>
+            <label class="theme-switch" for="checkbox">
+                <input type="checkbox" id="checkbox" />
+                <div class="slider round"></div>
+            </label>
+        </div>
+
         <header>
             <h1>AI魔方视界导航站</h1>
-            <div class="subtitle">精心整理的AI工具与资源</div>
+            <p>精心整理的AI工具与资源</p>
         </header>
-        
-        <!-- 标签页导航 -->
-        <div class="tabs">
-            <div class="tab active" data-tab="ai-models">
-                <i class="fas fa-microchip"></i> 文本生成
-            </div>
-            <div class="tab" data-tab="ai-tools">
-                <i class="fas fa-robot"></i> 图片生成
-            </div>
-            <div class="tab" data-tab="ai-video">
-                <i class="fas fa-video"></i> 视频生成
-            </div>
-            <div class="tab" data-tab="remove-watermark">
-                <i class="fas fa-water"></i> 去除水印
-            </div>
-            <div class="tab" data-tab="digital-avatars">
-                <i class="fas fa-user-astronaut"></i> 数字人
-            </div>
-            <div class="tab" data-tab="audio">
-                <i class="fas fa-microphone"></i> 音频
-            </div>
-            <div class="tab" data-tab="address-parsing">
-                <i class="fas fa-link"></i> 地址解析
-            </div>
-            <div class="tab" data-tab="video-summary">
-                <i class="fas fa-film"></i> 视频总结
-            </div>
-            <div class="tab" data-tab="hugging-face">
-                <i class="fas fa-code-branch"></i> Hugging Face
-            </div>
-            <div class="tab" data-tab="video-translation">
-                <i class="fas fa-language"></i> 视频转译
-            </div>
+
+        <nav class="category-nav">
+            <!-- Category buttons will be generated here -->
+        </nav>
+
+        <div class="content-panels">
+            <!-- Content panels will be generated here -->
         </div>
-        
-        <!-- AI模型 -->
-        <div class="tab-content active" id="ai-models">
-            <div class="bookmark-grid">
-                <a href="https://chat.deepseek.com/" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>DeepSeek</h3>
-                        <p>探索AI</p>
-                        <div class="date">免费</div>
-                    </div>
-                </a>
-                
-                <a href="https://tongyi.aliyun.com/qianwen/?spm=5176.28326591.0.0.40f76ee1zBYunq" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-cloud"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>通义</h3>
-                        <p>AI服务</p>
-                        <div class="date">免费</div>
-                    </div>
-                </a>
-                
-                <a href="https://kimi.moonshot.cn/?data_source=tracer&utm_campaign=TR_D0pcUf08&utm_content=&utm_medium=%E7%99%BE%E5%BA%A6&utm_source=baidu_search&utm_term=" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-moon"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>Kimi.ai</h3>
-                        <p>AI助手</p>
-                        <div class="date">免费</div>
-                    </div>
-                </a>
-                
-                <a href="https://www.doubao.com/chat/?channel=baidu_pz&from_login=1&origin_landing=https%3A%2F%2Fwww.doubao.com%2Fchat%2F%3Fchannel%3Dbaidu_pz%26source%3Ddb_baidu_pz_01%26keywordid%3Dweizhi7" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-seedling"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>豆包</h3>
-                        <p>AI智能助手</p>
-                        <div class="date">免费</div>
-                    </div>
-                </a>
-                
-                <a href="https://yuanbao.tencent.com/chat/naQivTmsDa/9a573469-1fea-447a-97ce-370fff122cf9" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-coins"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>腾讯元宝</h3>
-                        <p>AI助手</p>
-                        <div class="date">免费</div>
-                    </div>
-                </a>
-            </div>
-        </div>
-		
-        <!-- AI绘画 -->
-        <div class="tab-content" id="ai-tools">
-            <div class="bookmark-grid">
-                <a href="https://www.liblib.art/" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-palette"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>LiblibAI-哩布哩布AI</h3>
-                        <p>AI创作平台</p>
-                        <div class="date">每日固定200点</div>
-                        <span class="badge">热门</span>
-                    </div>
-                </a>
-                
-                <a href="https://www.xingliu.art/" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-meteor"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>星流 - 新一代AI创作工具</h3>
-                        <p>新一代AI创作工具</p>
-                        <div class="date">每日固定100点</div>
-                    </div>
-                </a>
-				
-				<a href="https://klingai.kuaishou.com/" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fab fa-kickstarter"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>可灵 AI</h3>
-                        <p>创意生产力平台</p>
-                        <div class="date">每月登陆送灵感值</div>
-                        <span class="badge">热</span>
-                    </div>
-                </a>
-                
-                <a href="https://jimeng.jianying.com/ai-tool/home/?utm_medium=baiduads&utm_source=pinzhuan&utm_campaign=title" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-seedling"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>即梦AI</h3>
-                        <p>一站式创作平台</p>
-                        <div class="date">每日登陆送积分</div>
-                    </div>
-                </a>
-                
-                <a href="https://civitai.me/" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-brain"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>Civitai中文网</h3>
-                        <p>AI模型社区</p>
-                        <div class="date">免费</div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        
-        <!-- AI视频 -->
-        <div class="tab-content" id="ai-video">
-            <div class="bookmark-grid">
-                <a href="https://tongyi.aliyun.com/wanxiang/videoCreation" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-paint-brush"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>通义万相</h3>
-                        <p>AI创意作画</p>
-                        <div class="date">免费</div>
-                        <span class="badge">新</span>
-                    </div>
-                </a>
-                
-                <a href="https://klingai.kuaishou.com/" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fab fa-kickstarter"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>可灵 AI</h3>
-                        <p>创意生产力平台</p>
-                        <div class="date">每月登陆送灵感值</div>
-                        <span class="badge">热</span>
-                    </div>
-                </a>
-                
-                <a href="https://jimeng.jianying.com/ai-tool/home/?utm_medium=baiduads&utm_source=pinzhuan&utm_campaign=title" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-seedling"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>即梦AI</h3>
-                        <p>一站式创作平台</p>
-                        <div class="date">每日登陆送积分</div>
-                    </div>
-                </a>
-                
-                <a href="https://hailuoai.com/video/create" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-film"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>海螺视频</h3>
-                        <p>AI视频创作工具</p>
-                        <div class="date">每日签到送100贝壳</div>
-                    </div>
-                </a>
-				<a href="https://www.vidu.cn/create/character2video" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-user-circle"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>Vidu AI</h3>
-                        <p>参考生视频</p>
-                        <div class="date">每日登陆送20积分</div>
-                    </div>
-                </a>
-                
-                
-                <!--
-                <a href="https://www.runninghub.cn/?utm_source=kol01-RH096" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-running"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>RunningHub</h3>
-                        <p>云端ComfyUI</p>
-                        <div class="date">添加于 2023-05-28</div>
-                    </div>
-                </a>
-                -->
-                <a href="https://chatglm.cn/video?lang=zh" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-comments"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>智谱清言</h3>
-                        <p>AI对话</p>
-                        <div class="date">免费</div>
-                    </div>
-                </a>
-                
-                <a href="https://video.hunyuan.tencent.com/" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fab fa-tencent-weibo"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>腾讯混元AI视频</h3>
-                        <p>视频创作</p>
-                        <div class="date">免费</div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        
-        <!-- 去除水印 -->
-        <div class="tab-content" id="remove-watermark">
-            <div class="bookmark-grid">
-                <a href="https://image.baidu.com/search/index?tn=baiduimage&ipn=r&ct=201326592&cl=2&lm=-1&st=-1&fm=detail&fr=baiduimageedit&hs=0&xthttps=111110&sf=1&fmq=1713767239197_R&pv=&ic=0&nc=1&z=&se=&showtab=0&fb=0&width=&height=&face=0&istype=2&ie=utf-8&word=bdaitpzs%E7%99%BE%E5%BA%A6AI%E5%9B%BE%E7%89%87%E5%8A%A9%E6%89%8Bbdaitpzs&oq=%E5%9B%BE%E7%89%87&rsp=-1&lid=10069686546447852841&toolType=3" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>百度AI照片编辑器</h3>
-                        <p>图像处理</p>
-                        <div class="date">免费</div>
-                    </div>
-                </a>
-                
-                <a href="https://www.shuiyinyun.com/tools/#/editor/videoToText" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-video"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>水印云</h3>
-                        <p>视频去水印</p>
-                        <div class="date">收费</div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        
-        <!-- 数字人 -->
-        <div class="tab-content" id="digital-avatars">
-            <div class="bookmark-grid">
-                <a href="https://www.heygen.com/?sid=rewardful&via=startp&gad_source=1&gbraid=0AAAAAq3VV6ZAiWVd-ErfIyX6bgh5LITzU&gclid=EAIaIQobChMI6722vuixjAMVXF4PAh01xChoEAAYASAAEgJZjfD_BwE" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>HeyGen</h3>
-                        <p>数字人生成</p>
-                        <div class="date">新用户有3次免费（需要魔法）</div>
-                    </div>
-                </a>
-				
-				<a href="https://jimeng.jianying.com/ai-tool/home/?utm_medium=baiduads&utm_source=pinzhuan&utm_campaign=title" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-seedling"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>即梦AI</h3>
-                        <p>一站式创作平台</p>
-                        <div class="date">每日登陆送积分</div>
-                    </div>
-                </a>
-                
-                <a href="https://zenvideo.qq.com/" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fab fa-tencent-weibo"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>腾讯智影-在线智能视频创作平台</h3>
-                        <p>数字人视频创作</p>
-                        <div class="date">收费</div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        
-        <!-- 音频 -->
-        <div class="tab-content" id="audio">
-            <div class="bookmark-grid">
-			    <a href="https://hailuoai.com/audio" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-film"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>海螺音频</h3>
-                        <p>AI音频创作工具</p>
-                        <div class="date">每日签到送100贝壳</div>
-                    </div>
-                </a>
-                <a href="https://ttsmaker.cn/" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-microphone"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>TTSMaker</h3>
-                        <p>文字转语音</p>
-                        <div class="date">免费</div>
-                    </div>
-                </a>
-                
-                <a href="https://peiyin.xunfei.cn/make" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-headphones"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>讯飞配音</h3>
-                        <p>AI配音服务</p>
-                        <div class="date">收费</div>
-                    </div>
-                </a>
-				<a href="https://app.dubbingx.com/tts" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-microphone-alt"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>DubbingX</h3>
-                        <p>AI配音工具</p>
-                        <div class="date">收费（有邀请码3天内免费）</div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        
-        <!-- 地址解析 -->
-        <div class="tab-content" id="address-parsing">
-            <div class="bookmark-grid">
-                <a href="https://greenvideo.cc/" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-link"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>GreenVideo</h3>
-                        <p>视频下载工具</p>
-                        <div class="date">免费</div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        
-        <!-- 视频总结 -->
-        <div class="tab-content" id="video-summary">
-            <div class="bookmark-grid">
-                <a href="https://bibigpt.co/" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-paint-brush"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>BibiGPT 学习助理</h3>
-                        <p>视频内容总结</p>
-                        <div class="date">收费（新用户有免费时间）</div>
-                    </div>
-                </a>
-                
-                <a href="https://tongyi.aliyun.com/efficiency/home" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-tasks"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>通义效率_你的工作学习助手</h3>
-                        <p>AI助手</p>
-                        <div class="date">免费（需要先下载好视频）</div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        
-        <!-- Hugging Face -->
-        <div class="tab-content" id="hugging-face">
-            <div class="bookmark-grid">
-                <a href="https://huggingface.co/models" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-code-branch"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>Hugging Face</h3>
-                        <p>AI模型库</p>
-                        <div class="date">模型库（需要魔法）</div>
-                    </div>
-                </a>
-                
-                <a href="https://huggingface.co/" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>Hugging Face</h3>
-                        <p>AI社区</p>
-                        <div class="date">社区（需要魔法）</div>
-                    </div>
-                </a>
-				<a href="https://lmarena.ai/" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-globe"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>Chatbot Arena</h3>
-                        <p>AI聊天机器人测试</p>
-                        <div class="date">需要魔法</div>
-                    </div>
-                </a>
-                
-                <a href="https://huggingface.co/spaces/Vchitect/VBench_Leaderboard" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-trophy"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>VBench Leaderboard</h3>
-                        <p>AI模型排行榜</p>
-                        <div class="date">需要魔法</div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        
-        <!-- 视频转译 -->
-        <div class="tab-content" id="video-translation">
-            <div class="bookmark-grid">
-                <a href="https://www.allvoicelab.cn/" class="bookmark-item" target="_blank">
-                    <div class="bookmark-icon">
-                        <i class="fas fa-language"></i>
-                    </div>
-                    <div class="bookmark-info">
-                        <h3>All Voice Lab - 一站式AI语音创作平台</h3>
-                        <p>视频转译</p>
-                        <div class="date">每月10000积分</div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        
+
         <footer>
-            <p>© 2025 AI工具书签收藏</p>
-            <p>最后更新: 2025-04-01</p>
-            <p>设计与开发：<a href="#">AI魔方视界</a></p>
+            © 2025 AI工具书签收藏 <br>
+            最后更新: 2025-04-09 <br> <!-- Extracted date -->
+            设计与开发: <a href="#" target="_blank" rel="noopener noreferrer">AI魔方视界</a> <!-- Added placeholder link -->
         </footer>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // 标签页切换
-            const tabs = document.querySelectorAll('.tab');
-            const tabContents = document.querySelectorAll('.tab-content');
-            
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    const tabId = this.getAttribute('data-tab');
-                    
-                    // 更新标签页状态
-                    tabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // 更新内容区域状态
-                    tabContents.forEach(content => {
-                        content.classList.remove('active');
-                        if (content.id === tabId) {
-                            content.classList.add('active');
-                        }
-                    });
+        // Default bookmark icon (Link icon SVG)
+        const defaultBookmarkFavicon = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iIzg4OCIgY2xhc3M9ImJpIGJpLWxpbmsiIHZpZXdCb3g9IjAgMCAxNiAxNiI+CiAgPHBhdGggZD0iTTYuMzUyIDEwLjcxQzcuMzQgMTIuMzE2IDkuNDYgMTQuMCAxMiAxNC4wYTMuNSAzLjUgMCAxIDAtMi40NTUtMS40NjJBLjI1My4yNTMgMCAwIDEgOS4wNDIgMTIuNUM4LjYzIDEyLjcyMiA4LjQ3IDEzIDguNTA0IDEzLjVhMi41IDIgLjUgMCAxIDEgMy4xNzctLjgwM2wtMS41NTgtMS41NThhLjUuNSAwIDAgMSAuNzAyLS43MDJsMyAzYS41LjUgMCAwIDEgMCAuNzA3bC0zIDNhLjUuNSAwIDEgMS0uNzAyLS43MDJsMS41NTgtMS41NThhMi41IDIuNSAwIDAgMS0uNDkzLTMuNDc1QzEwLjMgNC40OCA4LjQ3IDQgNi41IDRhMy41IDMuNSAwIDEgMC0xLjQ3NSA1LjM3MmEuMjU0LjI1NCAwIDAgMS0uMzE2LjMxNkExLjUgMS41IDAgMSAxIDYuMzUyIDEwLjcxem0yLjE4MyA0LjU1M2ExLjUgMS41IDAgMSAxIDEuOTE4LTEuNTgybC0xLjkzNSAxLjkwNGMuNDYzLjI3Ni45NzMuNDUgMS41MS41NjlhMi41IDIuNSAwIDAgMCAxLjY0LS4zMDVsMS41NTggMS41NThhLjUuNSAwIDAgMCAuNzAyLS43MDJsLTMtM2EuNS41IDAgMCAwLS43MDIgMGwtMyAzYS41LjUgMCAxIDAgLjcwMi43MDJ6Ii8+Cjwvc3ZnPg==';
+
+        // --- Category Icons (Base64 encoded SVGs) ---
+         const categoryIcons = {
+            //"书签栏": 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iY3VycmVudENvbG9yIiBjbGFzcz0iYmkgYmktYm9va21hcmsiIHZpZXdCb3g9IjAgMCAxNiAxNiI+CiAgPHBhdGggZD0iTTIgMS41YTEuNSAxLjUgMCAwIDEgMS41LTEuNWg5QTEuNSAxLjUgMCAwIDEgMTQgMS41djEzLjA1OGExLjQ5IDEuNDkgMCAwIDEtLjcuODE3bC00LjIgMy41LTMuOTk2LTMuNWExLjUgMS41IDAgMCAxLS43LTEzLjAxNlYxLjV6Ii8+Cjwvc3ZnPg==', // Simple bookmark
+            "AI模型": 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iY3VycmVudENvbG9yIiBjbGFzcz0iYmkgYmktYnJhaW4iIHZpZXdCb3g9IjAgMCAxNiAxNiI+CiAgPHBhdGggZD0iTTUuNSAyQTMuNSAzLjUgMCAwIDAgMiA1LjUgMy41IDMuNSAwIDAgMCA1LjUgOSA0IDQgMCAwIDEtNS41IDExIDMgMyAwIDAgMS0uNDMxLjk4QTQuNDkgNC40OSAwIDAgMSA0LjUgMTRhNC41IDQuNSAwIDAgMS0uMDU2LTIuOTkyQy43MjQgMTAuNzMzIDAgOS43NjEgMCA4LjUgMCA2LjAyNy43NzUgNC40MzIgMi4wNjMgMy41QTMuNSA0LjUgMCAwIDEgNS41IDJ6bS0zLjUgNmEuNS41IDAgMCAxIC41LS41aDEuNWEuNS41IDAgMCAxIDAgMWgtMS41YS41LjUgMCAwIDEtLjUtLjV6bTEuNSAyaDEuNWEuNS41IDAgMCAxIDAgMWgtMS41YS41LjUgMCAwIDEgMC0xem0zLjE1LTUuNWEzIDMgMCAwIDEtLjQzMS45OEE0LjQ5IDQuNDkgMCAwIDEgNy41IDE0YTQuNSA0LjUgMCAwIDEtLjA1Ni0yLjk5MmMuNzI0LTEuMjQzIDEuOTc2LTIuMDU4IDIuMDYzLTIuOTEyQTMuNSA0LjUgMCAwIDEgMTAuNSAyeiIvPgo8L3N2Zz4=',
+            "AI画图": 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iY3VycmVudENvbG9yIiBjbGFzcz0iYmkgYmktcGFsZXR0ZSIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICA8cGF0aCBkPSJNMS41IDIuNWExIDEgMCAwIDEgMS0xaDExYTEgMSAwIDAgMSAxIDF2OSA1MWExIDEgMCAwIDEtMSAxSDEwLjczMmw0LjEyOS00LjEyOWExIDEgMCAwIDAgMC0xLjQxNWwtMi0yYS45OTkuOTk5IDAgMCAwLTEuNDE0IDBMMTAgNy41ODZWOS41YTEgMSAwIDAgMS0xIDFoLTYuOTYvbC0xLjMzNi0xLjMzNmEuNS41IDAgMCAwLS43NTYtLjMzTDEuNSA4LjYyMlYyLjV6bTctMS4wNDZhLjUuNSAwIDEgMCAwIC45MTYuNS41IDAgMCAwIDAtLjkwNnptLS4xMTgtMS4zNzJhLjc1Ljc1IDAgMCAwLS4yNzItMS4yMTVjLS4yMjYtLjAyOC0uNDY1LjA1Ni0uNjE0LjIzNGwtMS4zMzIgMS42NjVhLjczMi43MzIgMCAxIDAgMS4xNjkuOTM4TDEwIDEuODgyeiIvPgogIDxwYXRoIGQ9Ik0xMCAuNWExLjUgMS41IDAgMSAxIDAgMyAxLjUgMS41IDAgMCAxIDAtM3ptMCAxYS41LjUgMCAxIDAgMCAxIC41LjUgMCAwIDAgMC0xem02IDYuNWExLjUgMS41IDAgMSAxLTMgMCAxLjUgMS41IDAgMCAxIDMgMHptLTEgMGEuNS41IDAgMSAwLTEgMCAuNS41IDAgMCAwIDEgMHoiLz4KPC9zdmc+',
+            "AI视频": 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iY3VycmVudENvbG9yIiBjbGFzcz0iYmkgYmktZmlsbS1ydWxsIiB2aWV3Qm94PSIwIDAgMTYgMTYiPgogIDxwYXRoIGQ9Ik0wIDIuNWExLjUgMS41IDAgMCAxIDEuNS0xSDN2MmgtMS41YS41LjUgMCAwIDAtLjUuNVY0SDJWMy41YTEuNSAxLjUgMCAwIDEgMC0xem0yIDBoNFYxSDNWMS41em0yLjQwOCA4LjczNWMtLjIxOC0uMzE1LS40MDYtLjUgLS40MDYtLjcwMWEuNDkxLjQ5MSAwIDAgMSA0OTItLjQ5MmMwIC4yMDEtLjE4OC4zODgtLjQwNi43MDFsLS41NTkuNzg1YS40OTMuNDkzIDAgMCAxLS41OTUuMDk5Yy0uMzIzLS4yMTgtLjg2Ny0uNDctMS41MjUtLjQ3cy0xLjIwMy4yNTItMS41MjUuNDdjLS4yMjIuMTUtLjQ1Ny4xNjktLjU5NS0uMTAxbC0uNTU5LS43ODR6TTkgMS41aDRWM0g5VjEuNXptMiAwaDF2MmgtMVYxLjV6bTEuNSAwaDEuNWEuNS41IDAgMCAwIC41LS41VjJIMTR2MS41YTEuNSAxLjUgMCAwIDEgMC0xLjV6TTMuNSAxNHYtMmg5VjE0SDMuNXptLTEuNSAwVjkuNWExLjUgMS41IDAgMCAxIDEuNS0xLjVIM1Y5LjVhLjUuNSAwIDAgMC0uNS41VjE0SDJ6bTEyLjUgMFYxMC41YS41LjUgMCAwIDAtLjUtLjVWOUgxMyA4LjVhMS41IDEuNSAwIDAgMSAxLjUgMS41VjE0aC0xLjV6TTAgNUgxNnYxSDBWNXtNMCA3SDE2djFoLTFWNy41ek0wIDlIMTZ2MkgwVjl6Ii8+Cjwvc3ZnPg==',
+            "去除水印": 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iY3VycmVudENvbG9yIiBjbGFzcz0iYmkgYmktY3JvcCIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICA8cGF0aCBkPSJNMS45Mi41YTEuNSAxLjUgMCAwIDAtMS41IDEuNXYxMmExLjUgMS41IDAgMCAwIDEuNSAxLjVoMS4wOFYwaC0xLjA4ek0zIDBoMTAuMThhMS41IDEuNSAwIDAgMSAxLjUgMS41djEyYTEuNSAxLjUgMCAwIDEtMS41IDEuNWgtMTAuMThWMHptNy42NDYgMTAuNjQ2YTEuNSAxLjUgMCAwIDAtMS41LTEuNWgtNmExLjUgMS41IDAgMCAwLTEuNSAxLjV2Mi4wN2gxMVYxMC42NDZ6TTcgMHY0aDJWNFM4IDBoMVoiLz4KPC9zdmc+',
+            "数字人": 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iY3VycmVudENvbG9yIiBjbGFzcz0iYmkgYmktcGVyc29uLXZpZGVvMyIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICA8cGF0aCBkPSJNMTQuMjQzIDEuMjU4YTMgMyAwIDEgMC00LjI0MyA0LjI0MiAzIDMgMCAwIDAgNC4yNDMtNC4yNDJ6bS0zLjQ0IDIuMDJhMiAyIDAgMSAxIDIuODI4IDIuODMgMiAyIDAgMCAxLTIuODI4LTIuODN6TTEuNSAxNGExLjUgMS41IDAgMCAwIDEuNS0xLjVWMTEsODIyYy4xMzItLjU2Ni4zNTItMS4wOTMuNjQ3LTEuNTg4QzQuMzcyIDguODE4IDUuNTI1IDggNyA4YzEuMTIwIDAgMi4zOTEuNDMyIDMuMzczIDEuMjM0LjMxNi41MDQuNTU1IDEuMDYzLjcwNCAxLjY0NWwuMTcgMy4yNTFhLjUuNSAwIDAgMCAuOTk4LS4wODNMMS41IDE0eiIvPgo8L3N2Zz4=',
+            "音频": 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iY3VycmVudENvbG9yIiBjbGFzcz0iYmkgYmktc291bmR3YXZlIiB2aWV3Qm94PSIwIDAgMTYgMTYiPgogIDxwYXRoIGQ9Ik04IDE1LjVhLjUuNSAwIDAgMC41LS41di0zLjNhLjUuNSAwIDAgMC0xIDB2My4zYS41LjUgMCAwIDAgLjUuNXpNMyAyLjZhLjUuNSAwIDAgMCAuNS41VjE0YS41LjUgMCAwIDAgMSAwdjkuOWEuNS41IDAgMCAwIC41LS41di05LjhhLjUuNSAwIDAgMC0xIDBWMi4xYS41LjUgMCAwIDAtLjUtLjV6TTEzIDEzLjRhLjUuNSAwIDAgMCAuNS41VjRsLTEgMEMxMyAyLjg5NSAxMi41NTIgMiAxMS41IDJoLTEuMTI2YTQuNDggNC40OCAwIDAgMC0xLjczNC40NjJBMy41IDMuNSAwIDAgMCA4IDNINWMtMi40OCAwLTUgMy41LTUgNS41IDAgMS4yMjUuNTYyIDIuMjU4IDEuMDMyIDIuOTk1QTIuNSAyLjUgMCAwIDEgMyAyLjZ6Ii8+CiAgPHBhdGggZD0iTTcgMWEuNS41IDAgMCAwLjUuNVYxM0g2VjEuNWExLjUgMS41IDAgMCAxIDEuNS0xLjVoMXptNCAxMy45YS41LjUgMCAwIDAgLjUuNVY0aC0xVjEzLjl6Ii8+Cjwvc3ZnPg==',
+            "地址解析": 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iY3VycmVudENvbG9yIiBjbGFzcz0iYmkgYmktbGluay00NWRlZyIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICA8cGF0aCBkPSJNNi4zNTIgMTAuNzFBNi4zNTIgNi4zNTIgMCAwIDAgMCA4YTguNSA4LjUgMCAwIDAgMTQgMHEwIDEuNDctLjUzNyAyLjhhMy41IDMuNSAwIDAgMC0xLjU4NiAyLjExNEExLjQuNjkgMS40LjY5IDAgMCAwIDEwLjUgMTRhLjI1My4yNTMgMCAwIDAgLjEwNS4wNjhMMTggOS41bC0xLjM1NSAxLjM1NUwxMC4wOSA4LjVaTTggMWEzLjUgMy41IDAgMSAxIDAgNyAzLjUgMy41IDAgMCAxIDAtN3ptMCAxYTIuNSAyLjUgMCAxIDAgMCA1IDIuNSAyLjUgMCAwIDAgMC01eiIvPgo8L3N2Zz4=',
+            "视频总结": 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iY3VycmVudENvbG9yIiBjbGFzcz0iYmkgYmktY2hhdC1zdWFyZS10ZXh0IiB2aWV3Qm94PSIwIDAgMTYgMTYiPgogIDxwYXRoIGQ9Ik0wIDJ2MTEuNWExLjUgMS41IDAgMCAwIDEuNSA1LjVINHYtMS41SDIuNVYySDB6bTEuNSAwVjEzSDhWN0gxLjV6bTEzLjUgMWExIDEgMCAxIDEtMiAwIDEgMSAwIDAgMSAyIDB6bS0yLjUtLjdjLS40NzQgMC0uODguMTYtMS4xOC40NWwtLjA0OC4wNjJhMi41IDEuOSAwIDAgMC0uOTI2LS4zM0M5Ljg4NiAxLjUgOC45ODMgMS43NSA4LjUzMyAyLjEyTDUuNSAxMy4xNGwtLjQ1Mi0uODY1YS45OTkuOTk5IDAgMCAwLTEuNS43N2w1IDExLjVhLjUuNSAwIDAgMCAuOTEzIDBsMy44MTItMy44MTJhNS41IDUuNSAwIDAgMCAxLjAzNC0xLjA3NyA0LjQ5IDQuNDkgMCAwIDAgLjU4LTEuNzVhNC41IDQuNSAwIDAgMC0xLjUtMi43NHptLTYuMDcgOS4xOUwyLjY1IDEzLjFsLjkxNi0xLjU5MyAxLjYgMi43NzF6Ii8+Cjwvc3ZnPg==',
+            "Hugging Face": 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iY3VycmVudENvbG9yIiBjbGFzcz0iYmkgYmktZW1vamktc21pbGUtdXBzaWRlLWRvd24iIHZpZXdCb3g9IjAgMCAxNiAxNiI+CiAgPHBhdGggZD0iTTggMWE3IDcgMCAxIDAgMCAxNCA3IDcgMCAwIDAgMC0xNHptMCAxMmE1IDEuNSAwIDAgMS0xLjczMi0uOTk0bC0uOTUtMi44NTNhLjUwMi41MDIgMCAwIDEgLjk1My0uMzE4bC45NDkgMi44NDZDNi44NzIgMTIuMDUxIDcuMzggMTIuNSA4IDEyLjVzMS4xMjgtLjQ0OSA5LjI4Ni0uODYxbC45NDktMi44NDVhLjUuNSAwIDEgMSA5LjU5LjMxOGwtLjk0OSA4LjU4N0ExLjUgMS41IDAgMCAxIDggMTN6bTUuNS04LjVhLjUuNSAwIDEgMC0xIDAgLjUuNSAwIDAgMCAxIDB6bS04IDBhLjUuNSAwIDEgMC0xIDAgLjUuNSAwIDAgMCAxIDB6Ii8+Cjwvc3ZnPg==',
+            // "视频转译": 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iY3VycmVudENvbG9yIiBjbGFzcz0iYmkgYmktam91cm5hbC1hbGJ1bSIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICA8cGF0aCBkPSJNNCAxLjVhMSAxIDAgMCAxIDEtMXgzLjI5M2wxLjY0NiAxLjY0NlY4LjVhMSAxIDAgMCAxLTEgMXgtNmExIDEgMCAwIDEtMS0xVjEuNXptMyAwaDJ2MmgyVjEuNUg3em0zIDUuNzVhLjI1LjI1IDAgMCAwLS4yNS4yNXYuNzVILjI1YS4yNS4yNSAwIDAgMCAuMTc3LjQyN0wyLjUgMTNoMS4zOTZBMi41IDIuNSAwIDEgMCA4IDEwLjVhMi41IDIuNSAwIDEgMCA0LjEwNCAyLjVINXYtMS41YzAtLjY5LjU2LTEuMjUgMS4yNS0xLjI1SDEwVjcuMjV6bTYgMi4yNWEuNS41IDAgMSAwLTEgMCAuNS41IDAgMCAwIDEgMHoiLz4KPC9zdmc+', // Removed
+            "其他工具": 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iY3VycmVudENvbG9yIiBjbGFzcz0iYmkgYmktZ2Vhci13aWRlLWNvbm5lY3RlZCIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICA8cGF0aCBkPSJNOC45MzIgMy43MTZhMy45NyAzLjk3IDAgMCAwLTEuMTQxLjA0MmwyLjM1NSA0LjcwOWEuNzUuNzUgMCAwIDAgMS40MTYtLjcxM2wtLjM0Ny0uNjkzbC0xLjY1OCAzLjMxN2EzLjk3IDMuOTcgMCAwIDAgMS41MDQtLjE3NWwyLjE5IDEuODRhLjcyMi43MjIgMCAxIDAgLjk0Ny0xLjFsLTEuODEzLTEuNDRhNC4wMDcgNC4wMDcgMCAwIDAgLjA2Mi0uODIxIDQgNCAwIDEgMC03LjkwOCA1LjYxNkExLjUgMS41IDAgMCAwIDguOTMyIDMuNzE2em0tMi4wMDkgNC43NjRhMy4wMDQgMy4wMDQgMCAxIDEgMy43MDYgMi4zMzJsLTMuMTg2LTMuMTg3Yy0uMjIzLjM0LS41LjYyOS0uODI4LjgyOEw4LjUgMTFhMyAzIDAgMCAxLTEuNTc3LTUuNTI0em0xLjA0LTEuNjNhMiAyIDAgMSAxIDIuODA0IDIuODA0IDIuMDAxIDIuMDAxIDAgMCAxLTIuODA0LTIuODA0eiIvPgo8L3N2Zz4=',
+            // "ds": '...', // Removed
+            // "API": '...', // Removed
+            // "多维表格": '...', // Removed
+            //"Other": 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iY3VycmVudENvbG9yIiBjbGFzcz0iYmkgYmktYXJjaGl2ZSIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICA8cGF0aCBkPSJNMS41IDEuNWExLjUgMS41IDAgMCAwLTEuNSAxLjV2MTAuNWExLjUgMS41IDAgMCAwIDEuNSAxLjVoMTNhMS41IDEuNSAwIDAgMCAxLjUtMS41VjNhMS41IDEuNSAwIDAgMC0xLjUtMS41aC0xM3ptMCAxM1YzaDEzLjAxNFYxMy41aC0xM3ptNS42NDYtNy44NTRhLjUuNSAwIDAgMSAuNzA4IDBsMyAzYS41LjUgMCAwIDEgMCAuNzA4bC0zIDNhLjUuNSAwIDAgMS0uNzA4LS43MDhMOS43OTMgOC41SDQuNWEuNS41IDAgMCAxIDAtMWg1LjI5M0w3LjE0NiA2LjE0NmEuNS41IDAgMCAxIDAtLjcwOHoiLz4KPC9zdmc+' // Removed
+         };
+
+         // --- Parsed Bookmark Data ---
+        let bookmarksData = {
+             // ... (Keep the data structure from the previous response) ...
+             // Make sure the removed categories (ds, API, etc.) are actually gone from this object definition too.
+             "书签栏": {
+                 //links: [
+                 //    { "href": "https://www.google.com.hk/", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACIklEQVQ4jYWSS0iUURTHf/fe8RvHooE2VlT2FNqUGWmNEYUR9lhEEVJhUIsoXOQuap1Rq6KHNQt3LaPAIOxhlNTChUwLMU3NR1CklUzg6xvPd1ro2KhTHjjcA/e8/uf/hzmmqsUiEheRLhHxp/2TiDxQ1aK5+ZmFeSJSrwuYiMRVNZKuMxnFz51zu9T3GX/6iPGmRqS/F5WAUMEawuUVRI5UYjwPEWl2zlUYY8YMgIjUW2vPBkPfSV6uYbKvJ+uW3rZSojfuABAEQdw5d96oajHQqr7P8IUqpL8X43lEjp3EK4mBtfgt75l4+4po7U3cytWZPbcyjUlTidv642ipDu7foX7bh2zgs92jDhHpUlWdbNmuEw15OvqweqE7ZjboCAEFADrSjs1LkRM7NAt3+bWRebfYudFx9XguwFqbwePs9z/mT/6NLdAHMBpex28W0/C1Y1Zy05VFM75nUwiAZVGT/v5sgdcA3UurOPUrxvXOFhJD7fOmdn4LeNc5NbpkfWimv5mWZ8KXFKdfXqInOYBnc6gsPEjZ8mKssbQOtvEkMczYl0oK8z3un4lgppbYkhZS3Fp7bnD0Jxeba+lODmTFviFcxq29NeRHDUEQ1DnnqtNSjohIo3Nutx+keNz9gmf9zfQkB0ChYMkK9q2KcaLwMJFQGFV9Y4w5YIwZzyBBI2lRLcD9PVXN/SdFqlokInUi0iEiE9P+UUTuqurmufl/AKTzsFGmvUNUAAAAAElFTkSuQmCC", "text": "Google", description: "搜索引擎" },
+                    // { "href": "https://wuguan86.github.io/navigation/", "icon": null, "text": "AI魔方视界导航站", description: "AI工具导航" }
+                // ],
+                 folders: {
+                     "AI模型": [
+                         { "href": "https://gemini.google.com/app", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAB40lEQVQ4jZVTz2sTQRh938w3u2tIxYMHDxXsSbR60pMHiXgrRDwkRXoUBItYIaWCgjAX6UGrEvBPEKpFEPQeDzkVwaK0VEQRPIigIE12N9kfMx52Y38tIT4YZngz3+N9PwYYgqu322N1vV4e9kYMu3T5wMTBKDj2/wL1FxIAIrKXE6bqTm40gckNq2GFJZqJpJzJuLodSUDrFkNr8/Pu6g3pesdTr3RqanHtOjQZ6BbvfU+DXVdaUr+9kAKwtxrtS0l57PkWQ/kOI3ScqGOT6fb8iTcACLoloSspQJb2Kt5rrM4FrnywpYTqMNlASYSeQz5zHLJYeD870dzlQFdflw4fOTTe47gWud6V0PVO/xHGdJRA15EiVAIBs/EdRq9UEl1pP4TAckx4+eu3/S62cxE2IYFYEJJ8pURIKD8LgUQQDEBAmgWNb9fgHxp33s11FT/sOJJ9CRsoicBzKFAc+0IufL52dFcKAwekK1mFHy2ebfaNqRnJ/ZSlTSVbI2QU9+NaHkxZN/bXDwBQyVtVvb92c+rxF3v+6Td7prk5m/V4fxuLobWAtuLi0sanc082P2acLRy64klcP0nQZHpSPjOE5YxbKbRcbGllOgWABOpVCmN2cqMJ5Oio8lcOfhT+gQH+AvPiuEwImcWNAAAAAElFTkSuQmCC", "text": "Gemini", description: "Google AI模型" },
+                         { "href": "https://aistudio.google.com/prompts/new_chat?model=gemini-2.5-pro-exp-03-25&utm_source=deepmind.google&utm_medium=referral&utm_campaign=gdm&utm_content=", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAC70lEQVQ4jV2TT2hcZRTFf/f73pv3Js0k0yYkDdFIozWa0kKhNIgkrVZc+a8g3fgH3NmNSBElIEGKC6GgCxFcCAVdiAtBRd0UlbYabURDNG1jEEsrkZrGNsl0mnkz733HxZiNd3PO5t4DP841Hp7bQjVM4fwYoRUwMwBEWzfHTN4EzhTknVqtc6xHxyOqYYpS5WXyDSxKUBDY/3dBgqJRtE0MVq4ekK2FCGncQlYoNINaOIv+i9s8ZEKZQGL/SEUDPTHfXayFldW6J+JAhCNXVjjnsd5qzPJKw+GcrOQQQCb6uiPeef4OHt/X5WJn/HEts8dOLNn5xeu5oyHuHEztq9fu1uyJEXv/2LBu641MzcJMss7E7KOXdtiTY1XzZmoFNNyXusnD/UZwOIJs6sgAB+/t9Nu7Y56Z6LHPJnfSvzVG6y1eeLSPg7u6yFoFQbIQhAQdiQOHOYCOUhtaEWAjK9i7o4NXnuino+x5eqKHohDeGZF3JLGzIiic/HoFWiICeOOTq4wODIaRwcTKkQPgwd0VxnZXGOqN8d4Q8P1CjbkrDX347XXOnM+gEhFR9vy0UOf+V39jtD9hW8Xx7KFeHtpTYWQoJS05Lv2dcfTdy3xzoUazHiA2KKeQ50QoYEnM6q2M6fkapMbyrYCASuK5eiPn2Mk/OT23TjMXvitGEkEAro1BCHOGTxxvPXc77x0d4s0vlrmw1OCDs/+wb+cWZt/exQN7uygaBUGbHQGHJOcM1XMdHt/Ki4/0MzqYUqsVfPnjGh/PrHJoT4V7Bst8OnmXhrcn0GznIykCUEDEZvNXGjr1y7pNL9S1uJQhZ8z+vkHsHYBJMjMLgEG7Z8aRn6dxpTGUFTSDwzvIgxE7zBvKCvaPdPLU+DZO/VrT5z/cgNQHrOQpmuci0Fmi9D7y4CwFybBS+2cEkMbMLDaZmf8LIoM0AfD4FPLm6YjV6DjdNwOOCRXBAFNoE4YAOHwJLDVUBIpCwpnIbp5h7drr/wJsDFOVlXyx4wAAAABJRU5ErkJggg==", "text": "Google AI Studio", description: "Prompt创建工具" },
+                         { "href": "https://chat.deepseek.com/", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACcklEQVQ4jY2TO4icZRSGn/f7/v+fnVmzkEajomKjMIIQQ1C0WRHRzWDhZbAJiAHNZhPBLmJjCkWx0sLdmCAIwcZRC82IES+DKNgYxCKgnQQRkRCNy1z+y/darEtWyYKnOncOh/eBbc1aXHQG1mZ82b+SHXPYvniFvmMOYP1rY7fv4qZdzDV/0MQ2u7KMh5uG0cdv8l3vEHfUNTvPnNRnW2f+OVHuHfbRKA7YXB13eAosxEKdcswekJHv7FzFC/uWveKc07Fhr+EuAfQONa+0OuFoNTUgJEjJxKgqJb4Z/8VjRae6sT2fn62mjG3Oz81z62TdAy0tV/cURfa1BAhSDcmuMRGTWh3FcsoPs0vcne/g2SzjRYC64avKk/1ZCOGJpuZTEu9Z7FbwI1mua5rSDUFhOvHPWabbiwV/Se13HIJT4rnhql4FCLJuSSl9cvq4Tg7XtFJV2l2VvB1yxZBh7NFsRi8Eunk7vGbjqmbjkX3HQOBPBd0HVrfv4swJ/Tpc1ZOp4i2JEKP2K1I3tV4POXWyz88u8hMAAzVB6PMQtHT/Aa49N1DJojOAj37nYF35+5ApRvwh8mFMZvv90UDrm6IKKXEKuNDu+AQAI9UPrnjvIrQnpR5PDZWCWjFoYTbmbFOGlzYUIAOE4Zou1olnio56Dx3xqW7fRXR6dOf1fFuIpixZkjzNWggxcslsq6S1KaR9B72ctbyWGi5h1uc6um42caWgN1LtG0KmecTNTc3zw1V9AA6gtAUU+YGnfFuec0Rwb8Klgn7D/DhuePmL4/ql23dxbqByO/ouw9R/N+552vn/guu/S/p9x62ZjXh7jP8GIyojXsMDG+sAAAAASUVORK5CYII=", "text": "DeepSeek", description: "探索AI" }, // Simplified
+                         { "href": "https://bailian.console.aliyun.com/?spm=5176.29597918.J_SEsSjsNv72yRuRFS2VknO.2.1e8c7ca0EWEDfV#/model-market", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABXklEQVQ4ja3TvU5VURCG4WfW3ptwEjDGWOglGI0WdFZEr+FcgdGAFnSGkk5iR4XReAVcg4TKzkKjsbOVwlgI5BD2z1gAxwYsPE49X9a8M+9i1kpiluw0nM8t+m5wbHDFSOUgXmshn2j0Fv0yMa+4qcRLB1DnijsqW44sWTDnqpHWR60H+Al6ixq7brinM3HkJJ/5oLcWueqzebedYPBVeCe9iW2fzvGCzFV3hcfSQ8Utczj2JfKpVOu0Nv2wETv6v3KPVa7b0FjXqYsw6Ewc2owdfS6rLw0vq2NH79CmzkQYaimkQaNA7OlyxZbGff3pElUarffxyhpoFGlAXPxa2Be+Gc5wapWwf1FrLSSK1jAdc9uLSxH2dFqDeUXIIhW1kQXrOVbFnu58WUlJSo5VU7yxyoJ1tZFU/sMZz0ViyWBO/UekeHsqUj5yTWNXcyZSccKZSLOqPPNn+tfstH4DoqinIboRo4IAAAAASUVORK5CYII=", "text": "阿里云百炼", description:"模型市场" },
+                         { "href": "https://tongyi.aliyun.com/qianwen/?spm=5176.28326591.0.0.40f76ee1zBYunq", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAC+0lEQVQ4jQXBvWudZRwG4Pv+PR/vez5jvjgpJtrBDqapQgqmCqIgIkQRBNHFxcVBnBS7OXWwfqD+AQ46KAUnQTqI1kXqYBtw0KElGIcGjyY2Juack/M+z3N7XQSA9Xd3z+c4994k+8cz4WMWAwyBhBUhlMIKplAKqsKmG/VjGB1c/PzS4k2ef//O+jgsXi0IA53kYhArGpgMLhX0HeAFVCJCEaoEdSozh2Y4He9u+pHNfyyGgU7yNAjBg0ACluoJFrrgcN8jmlO7CBGEA4hJmVYhDFq29JEhxQuc5hLB0CXZhsOMEj98mfzsjagnH8wq4xE7TAw5ySWxlRXiJJdeEx7j2uVcDEJVCDbC0b/C25vAq085piSMTxKGd6U6GP45yPjiS0DjgIpCLQcfBbRlyKPCp9ca3T+X+cAAANrwHuh5h17HCBDLA4cb90106xex3XIKGfCdLLoEnOonXXze2GlV+Pb6Ib75boxe20MSSiP0+xmT46I/bgXORJNPhVUhfK0ib4bpsbjzp2n1NLjxUBvvfDDF4YFDlLDUbfDa6w517Xj7RtFf25mdyhQEWCsT/SxyVOvK1cTJJGGm6/HKC4a52GA+Frz0omF5OWJhocIzz3l0fUadDN1CWCuDIVGzUdzdNeztSaUI62crnFnOWDnVYPVhj5wFAJi/1zhbm+pGrLPoI0wVxTySzp0FV1YcAcDMcGEjo90x0IDJIbC91WD/tlQOHHseioXw7UwEUQzC/u/U9q8ZswvA8ZFgMJ5ZbYEkfrs21dZXxGzf4x5H+UREAr4uSA50NUCMHK98itIJjZ38V7C2YTr3CLG3k7j9Q+FgvlUiZD5R3qAoJN/y0+s1qydsjGkkQnBkbCr1nTD8ufDrnQY4yqqbgEAwylQVNX3PmDj5ycCjtyqkYScw1tnUS0SrABWALk35TlQ8qtCFRycBdYbmjNExDadx+KZdvrR4s7iDzWjpWhdKTkSA4FEYCtAKQG3GSkBNqlWQ4NL3d93fzz76yemt/wE/gm5HWr4d8AAAAABJRU5ErkJggg==", "text": "通义", description: "通义千问" },
+                         { "href": "https://kimi.moonshot.cn/?data_source=tracer&utm_campaign=TR_D0pcUf08&utm_content=&utm_medium=%E7%99%BE%E5%BA%A6&utm_source=baidu_search&utm_term=", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACCElEQVQ4jYWTMU8bQRCFv9lbG2NkkFzEEpIjpUv4J5ShoKCAdGkoIgHyj0AKRRo6SiLxAyJRpqV2ESIr4uKYAjchyDmdvPtS3B1cSJS8Zme1b2dm3+yDAtvAEPgJBCACKtd6HLBkBjYEdsq77NRI4S+XHsf1/TbAZ0Bmlrdareicq5MEqLW4qNZCM9JoR15sRDpP8+LMLnHOzYC4vr4e0zSNg8EgAvLeC4h7e3tx/G2iN69fiWcb0b2TePm+LOJmzswWAFZWVuj3+7a6umpmphgj3W7XDg4OrNd7wofzc5F/N32diPRj+XoteEkGEEJAkrIsQ5JJYnNzk16vx9HREZ++TMySqfT2Ocx/VAnMm5kBmBlmRrfbpd/v02632d3dJU1TTk9PC3rIDXLASnmAJEkiELe2tqIkhRBUx3w+1+3trQ4PDwtRzerTiL6aZYwRgKurK0ajEUmS4Jzj4uKCtbU19vf3OT4+ZjQaYWZIRQd+7IcQAgBnZ2cMBgOcc/eJT05OiDGyvLxMxa/gVaUCJOG9LyUpqjjnaDabVTJVvArOzFRqgZlZkiQ1hYoOvPc453DO3Qte1XSScoC7uztubm40nU4FmCTK7nR9fc14PCbLsofSBTKAS0BJkuSdTid67//4yo1GQ0tLS9EeJlB+ZS4rJ/7LMI/jUNv/5sghMPuvnQvLDysn/gK2LDHPFYe+SAAAAABJRU5ErkJggg==", "text": "Kimi.ai", description: "AI助手" }, // Simplified
+                         { "href": "https://www.doubao.com/chat/?channel=baidu_pz&from_login=1&origin_landing=https%3A%2F%2Fwww.doubao.com%2Fchat%2F%3Fchannel%3Dbaidu_pz%26source%3Ddb_baidu_pz_01%26keywordid%3Dweizhi7", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAADbklEQVQ4jU3TXWxTdRzG8ef3P6ft+t5uMCDrpjAUzWI72ZZMRsZiDDdKILoEIQQ0OJ3TmeiNGL3ojVES40U3syG+zES9xIuFKIJLpzAqsA1ncCQTHFs3267t+rL17Zzz/3khS3juP3fPlwAAzAQiBoBry1qnYlJ7BGG/oRleEooAIyOAn8rrpeH2RuvlBw3h/kZvsK2+QZ4mRfSV1gri/NeDuD15hS1WO/YePEL+PU/D6bHDMGRoYV68d6CVCgBAwSCLp3phrSWcc3iwP76Yk5+fekXOTU0Ib3UNZbI5ZNYLXFfXIA/1vSuePdEtUgn+WQU9/8MwigQAUwkO2e3oz2UhL33zCX4cGRS+h7ZzfCUJ0jS43G7EEwmUdcmnvhzV2rr8lmTcGGzZpvaLyRi3Q/Lr2SxkYTWGybHzZHd5OZlMof3RHTT06Wka+WIIxw93o7ieo7t/XjPlcpAM9E7HeY8gRq9QSFUU0D8zEcokV7BeKmO7207vvPEa7wwEYDeb6eRLx+nowef45kSYdA2kqooqgR7BhH1aGUwAzd+aRrGiwaxr1NL0ON9ZjFIpnkA5n+PJiSvc8aSfPBaBYqHChg4mxj6ha6gzmMEG80o8BtZ1bKrdwp/9EqHIX3/DYjUjlV6lby+E6fZSAl2dXWAhyNABXYdPEAACgRlgaUDTdbTWb8WJjjY0NzUBVVaQEEgux9hXV4+OBg/s5TUYBIABVTUhakg8DBBV2R0MoUAQ0du9LwNON/LRKLw2G3//4QcUS69yocoLqZrZpIAE8ZJgwrjZBBIKWBoGuLiGsdk5vnprlovlMpfm78LIpmhmcYG/+m0ayUc6URY2tphBYBpXBXDWkHyMmcTuZw5Bq2hUZIXH7uWFS0xjc+0Wvh7L4ePQEHz+dhywKFSoSGg66Uw0vHGkAYcDb66mAdUEOKuB/EKKxYUzMIpFSrZ1s2dXgKwCKJVQ8dbAvJbDwO6t9JYSDLKobsG4WUOry41GqQOXL4b1zfd+p+bmAHm3+SAy//K5i2E9EY/RY/5daqWESwlGz05H0NhoCWdGl23Xl/KhY6/2V2w2B/e9+AKnZiKycucPGfnuLG9yu9jhcFbe/yg0cCPN7g13v0Ym4P+cAext2NF4kll0+Wo8Pn/gCZ66ORNdTKTDTodlZG529tcHLP8HmYOtlz2pLo4AAAAASUVORK5CYII=", "text": "豆包", description: "AI智能助手" }, // Simplified
+                         { "href": "https://yuanbao.tencent.com/chat/naQivTmsDa/9a573469-1fea-447a-97ce-370fff122cf9", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAADNUlEQVQ4jVWTTWicVRiFz/vee7+f6fykaVOatgFNW10oQYWiYLU0XQpZCiJSCqWgVHDR4krIokXEnSJCSXShuBIFi0G7sJNFQKRoUWu1Jm0S8zeZZKadmcx8P/fe18XUhWd/zrM5D6EfAiAAcKPbfdZZexZC41lmDwqIPUe1uQdh9d1FO9UZN7P9ihBAQg8H8MHMTPj8qeOXYHGeWUVJL4XzIiIAkaK9pTI+X4GdXpHp9R8bF/H2ULtPnpxkGXy1+NvZvZ/tjgcm1ho17wEnQkpABBByz1LW5CNd5Mt1wzPLrtpsqQlMoKNQrcrcR6OXvsbNM3/W7qXH4lHl4RURiKjPYIA8wCOFCPcavawVh0f+2ekOydHgKg//cfmZX5PW+dtrTfvF/Tv6drpOu1hDIGAIFHvkklFJMyJmSig3j9qmLQTujLnWfFEbGTgXqiCyPrchBzxoCiLswOJYoLwTobI2eLxUxkJipWl7NGAUdoVOeXFvaCWVcWSQ3Gu+MDwmo0GJWj4XAaRiNI1EFRR1gMR7fFPfIq0sAM/semKUPqGVDYbb1uKF4gG8VNmPRp4gYkOh0Rgp7BaA6Fa3Ld9tbdFylktRG9TSjDJpw4jZp1mYCAqnyvvg4VFUCvNZS35oNXAo3EbHOWlbTxCWWCsERFjM2hBKYLSDthSvBcxHDgaxKCK6mz/AW6vXwYjxin4SmQeFSgOiEBFjOW3jTrothTAkgDa5l5Wv5zREDPiAhKaaP8mm20QmTbqVLFGsnQRsRSsrd7OmzHZWhNHzJnakTVrVBV+5srqjT29kSh+Oe/J7uoSQE8qJZK77FxbzOgZVCdu5w2bmyFAkRscAdR1r/zHPPzf2c5KWPvw+269itnkuCQQ9CHaIuIulbJV+6S3Qar5BrNoiuJ/LHqeJdj6ZH5uYZZoUemT50DvfLvirN/BYeLI8iKZrOFAmTnZIc4qAM1HUdVZa8Hsk9L16lTq1C+h//WHelPCpl/Hea4f/fv3T/Eqw2K4j9JEABKKAOIxATlttClNZai/Wn5js/Kfx/3Q+9pWcOP70zdPX8i9PrqcbByDMrM26VkEVbKY3jr7f11lAIMi/olKlReBSV/wAAAAASUVORK5CYII=", "text": "腾讯元宝", description: "AI助手" } // Simplified
+                     ],
+                     "AI画图": [
+                         { "href": "https://www.liblib.art/", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACeklEQVQ4jS2SsY4bVQBFz31vxjPxjGOyCUhZSIgAhQIoVggIQkICyUJJAQ1VBOUW0EHJF6RD1CE94hdWtPABQEGXCiXSGnZtbzyeefMuhemubnF0pXP1zoe+UcPDYssidlB0qOxQlXEJqjJUxrVRbdwYXwI056Q75LhgziObxRBJLogqIZQ4DSAgAtEwgrMgg8aKsbrGJ8E8KoaGhQfGKCIlosLUoB1S3gOKgMaIE5BK5AmxM6MTi2JoyB4IuQBVWAOwQ2HASigKthlnobLFKeK8gdgTnMlFalDuoW1R9wynAdVTrAFFQ9fDy4foYI5P/0bs8LhG0VigkFu0rtCt2/jbL1HX4jRH6QDOW3hawvt34dP76PEpPlsjC2Nko9C3OM3wdoLuvYub62h7GTYtfP4ZvHEHloZ2CsdfoXv38U7IGQdwGKeob9EwhYsBDZchPQebGXz8Hty6DWcZbr4EveHOXfTRF3BxgRRQcAvjDNIUxgDLej99OIDzBKsR6gZ+/QO++wF++hlePQKXgCG4xZ5hGrha46NX4PohnDdQVUAFzwSv34S33oY3j/BmAz04gos8RbGCZYkfb9GDD/B6QF//Bn9t4CzCNsG/CR58g6uMfvweq0E5gZ7/xVlANorCBagQ1g7tOog7qLcQV/iFHtVPcPMEvfYPvrqEwu1eSRAegTHjrkeqcBDKEVLEk4CervD8CpQDXl3AFeGCKcFmdCAwomDsCSYhKnAPVGhX4TSBsUDKuD0nv7gkFppwoimLvCYRiBmQwcaMyCNoxAzgGWxa3LWMxYTi2ooTHfzuG7HhoXsWJACk/P/bMto3+ywwGTvD5JSTS39y/B9VQD3HIF+IZgAAAABJRU5ErkJggg==", "text": "LiblibAI", description:"AI创作平台" }, // Simplified
+                         { "href": "https://www.xingliu.art/", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABZElEQVQ4jcWTv65pQRSHv9kkki0aich4gk3UKjoJlVrnNbyBKDyG6CQ6rdITzK4VQ0MhjAh71inOsXNyt3sLzf2SVa0167f+jQIegOIzJA8EP/YJ/tOHKW8TzGYzjDF0Oh3a7TbGGIwx1Ov1TGz+XYJarUYURRSLRUSEKIoAGAwGGGMy8QkglUpFrLVirZXRaCRaa1kul3I8HuXF+XyWVqslwMuStIUgCNBao7Xmfr+z3+8Jw5ByuZwqlUolNpsNk8mERqNBEATgnPPOOdntdhKGoYRhKPP5XJxz8nw+5V88Hg+fV+r7BJRSeO9TNaUUL9/fePkTQKrVapp5OBwKIOv1OqN6u91kOp1Ks9mUXC6XpFvw3nM4HAAoFAporXHOcTqd0jlcLhe63S7b7Ta7hd+2WCxERKTf70uv10vVx+Ox/BGbvL0Day1xHHO9XhER4jgGYLVaZefwU8H/+wv5X/18gnwBkZfwfVE7leIAAAAASUVORK5CYII=", "text": "星流", description: "AI创作工具" }, // Simplified
+                         { "href": "https://civitai.me/", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACZUlEQVQ4jXWTPYhdVRSFv7Xv3/vLzGQmqFHzAzbBImgjWCjY2dvEIo2FtWBhoWCllWInKIKltemTFCnFUiJKmIAEeRk1L3kz991737l7W9w3k2lyqsU564N92Gtp/0dGz+/yRW586MEkAA+UCZUFSJyccHzdg6BOzvfz//hU9c98Na74uO0gAg/QqECHLdx/OGa+LEjJqHLn/NkuLu41kRlWlbBq+VrNDWqJkTsRoCpHt+9uxw+3z2v/4Yhlk5NcGMTurNO3H/wRVy+sok1I0OQBY48BHhXo5m/b8clPr2jVGZng3GzN9jRRd6bFURF1k0lC7oQZ4xyIcJQZLFeK726+qHZtzCrn2ptz3nvjgGnV0yXx96LShb0muoQQAiIHCKAqiV/3p9o/GAPw2qUlH737ABmsE2QGL+0muoQ8CAMB5O4oAhC6/8+Ibm1EwOuXl1gOh/UA9wFdGrYioRAIlGsQRMDjOic55AY7kwSA2QkEGnwcjy3IT5YsMD198zgVAE6Bp3QEWMQgFLA1SeQGvYtHdY6A3sF98PgGPA6XBGZGbC7i0l5DmTuZBb/cO8Oqha0JjEqYlDAdQ54N3mMm++x9PieQOzo7W8ed33d0sCxZHBU8eFQyqZwntfHXvxV37m7hoXhhZ63Ub6ZY3WD4RcCoQLc2QapbIxBV4UzLnq435osyvrx2T9ffPuBoRZiQCVaZwCDaNfHOq4/1zfU/460rC17ebRgVPU0yyszj6sVDXT7XhDtuBiZWzyxTl2D+pGBxlNMmY1b1PLfdxZnKIzhVpmfVWaAigyzb5AQiJcIDTE/r/D9ofUExtgFptwAAAABJRU5ErkJggg==", "text": "Civitai中文网", description: "模型分享" },
+                         { "href": "https://ai.sohu.com/pc/generate/textToImg?spm=smpc-ai.prompt-search.0.0.1743899799260kXbJje9&p=wechat", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAChElEQVQ4jVWTP4hcZRTFf+e+93Ymu+IfxEUQe8liv1gE7G2CEFJYiF3K9IksgoWN4IptGmvdzi6xiYhGDSJsKsFiNUos3OzOfDPvffc7FmNQb3Wb8zsHzr16O38/NHnNOQZGBgAJbESERnVbJ5ZvN+LWp3rxG/4zeuvsxHazjG3LiABbThtFyKCh37lAm3Klrju8d3Tn5vGVKyOArj48SUBsxI6Q1ffRzecIYUFdLHGdJqCf776g6ez86P5vf1w9vnix9llCQm5uSLIlTP6QZbyvCCyPTFxCs71Ws57/8mde2N29/Ooz/bvH0g1d/umhI6LZTXiTpZtvP86qNz5/5emvAN588OjDfuep69Pp6STREWEN/Xqq7EeWznUpZQlq6chFmDp71uv6MnYc2JGlm2cJtxLUEspzmsfZtpd+J1qRcim10rmtgizS+Lg5z4YRqR1IrS7V8lyqq84bI3XTaTXj8Hqfpds0Z0uS3WSIqNO/VbUSSge5kKSwacp1Q4qX+lxKgEXYQmoJ0dnjpCeAugA5qEsREiYgglDQZwmDBULINtlJct1qTwAugxPhdedqiybHbKY0v/ZZApBlTETEMI9OoixyxoFjk2AdgOtCQgEmpa2hrldfbgDGkkDxyK3dLWO7U+bnX3DwfAOon4wrGWXRxiwipqkux2y39NoHpQlZqBl9h+IeaIH8nMUQ1tpulxTec7YK5LAzm9WpvX/3endj04IBuYtu2O+32EfgBjIY8BjUNk4Q/bA99Ou/fPT1j/EeOPpWImwscHO2iv+RhWGzSRqi3xoMqzE5/PazBzc53hsBeq+7j22utWyBCRTYm5uWDIpRnX/Okdsyt77/SP97578BRXOjZdRx1s4AAAAASUVORK5CYII=", "text": "搜狐简单AI", description:"文字生成图片" } // Simplified
+                     ],
+                     "AI视频": [
+                         { "href": "https://tongyi.aliyun.com/wanxiang/videoCreation", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAADY0lEQVQ4jXWTTWhcVRzFz73vzpv38iaJnUwnn2Oi4CIhoNU0tTQtiAtT8SOhmRJtxVEQXIV2U/zEIIouXKiFLqTBprUNOP2gStOEirvSKqmomFqKicWSTDudaSaZmZf3ce/9u2gCduFZ/TfnwP8cfgz3iRjAaP/I3U9KRb3H4A6Tyv3syImGL/A/YuvGdBo8m2Vqa0+u9/DXie+vzPhiapLilh3ktVR93GK3UEgACSCX+ys4f/4RHwD4vRBG2SxTAPBqJvZWV7dIPv5E1NPa84RhJg0h/kDIc6hfWmBqOdeysWE2/cxyfD2AMpmlDhsLqYH+fGZwqGan1vBPfFPVQcB1ueJXq1VNrkum61K0UpY8CJwOJxG8DxAT/U/nNjcn2div15Lm9euhWV6mUrIR8cEhm4TA0tqfBAYYnBHjICIWOfmtmQBgiKZm88vFm6rbibHl5563Hzh90p3d2GTX9WwWKYDWaiIAHK4LxRkwN6fKCzeDzwEmhcFR64cWDh0sVz7+tN7Ztj2aevdA6TbAHUARA6BhMNMk98UBW3CDon/PqaXJCzwPEDO6uw5csyxj761caLW0GfnOzkhyZYXCny+HSc55LAhZrFjUTv9OK3j2Bau5vUM4j24yGwyt+PSF6BQ/NpH4UUovW1cbtyaOVYWUWNm1265tbeNFrYm0BqVSvDA0bDvFgvLGxypzgMbAkPXa8K7ClnszSvE2YaVSLBiJM6fcYkQwe/hlW3meln6g5Et7HcUYnMlzXunM6dXWSxflP06M+71bzFEBgCR0i4AZsWyKnD21mujbYRW2bovGp6e8FSmhep+MNCwuqtIP054Tj0esQwfLTZZpc2ZIhwOjPBJhH5G2olFT3kk28ju/zAS3AYi+7dHlPa84GtDi+LjrhaER45xgmoKUDqqlqhwRwKjWamSWC/nUOx/Us9SD7GGAwa3q1SCE19klHvr9N5m/MhPU1dc7zPPdfRHOzinpUzbbOCcAYP5P/8OePrbpxg00z8+jwhn01VkpBwbtdgL542NlXVNTVyPD8sWj94FFjK2fXZg1ryLPgVUCKgQ81vbT5fbvSndV6+GvvLoNG0ztef6OoxMNl9JpMrJZaIAR+y+aRGt0ZsHZbqg3Xi9kSOE9raOO1u7ZI8cb31xHft3zL+aRmF6nwg+8AAAAAElFTkSuQmCC", "text": "通义万相", description: "AI创意作画" }, // Simplified
+                         { "href": "https://klingai.kuaishou.com/", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACwElEQVQ4jX2UPUuzWRCGrzl5gga/oq9GUYughSCEiCCiiRD8BhEx+IUvYhOC+AckhUVaQbBOfkAIfqVRQaIoiKWNjY1YLgubXRGRIDxntjARt9li4DDDYe65z1wHYB34E3CNMS5gK6GO46jjOApoNS8iLuACfwC/BfgL+GWMsdZa8Xq9LC8vMzg4KE1NTRhjKJVK3N/fa6FQAEBEVFUN8A+AVjtHo1F7fHxs0+m0RiIRbW9vV5/Pp7FYTAuFgt7e3tqBgYGqQhdQRMQCdnFxUU9PT21fX19VrgIai8U0mUzqyMiIjcfjms1mbW9v7/dIjqpKKBRidXVVE4mElEolBaSlpYXd3V16enq4uroiGAxKLpfTj48PGRsb0+fnZzHG4AC6sLDA09OTlEolNcZIW1sb29vbXFxcUCwWcRyHqakp4vG4APr29iYVhV+G1NXVaTab1Y2NDfV6vZpOp7W7u7vq/ndsbm7q3t6ednR0/Mx/HWpra3V/f1+LxaJGo1EF1OPxKKAiooCenZ1pMpn8T80AGGMol8s8PDxgreXu7g4RwXVdPB4Pqko4HKa+vp6hoSEaGhpwXRcAA2Ctpbm5mXA4TC6XQ0RQ/RrRdV06OztZW1tjbm6Om5sbMpkMfr8fEUFExKoqs7Oz0tjYqO/v7+LxeLi8vOTz85Px8XEmJibIZrO8vLwAaCqVEr/frzs7OxgREUBaW1tVVeX8/FxrampIJBIcHR2xtLTEwcHB92WfzyehUEhPTk4EEKoL0dXVpZlMxq6srOjo6Kjd2trSycnJn27bYDCo+Xzerq+va4ULW30FF7D9/f32+vraFotFnZ6eVp/Pp4FAQIeHhzWVSunh4aGdmZmxgK2svwrwN9Bc8UIA5ufniUQiEggEsNby+vrK4+Oj5vN5yuXyT5hKAL8raLoVVP8X50pnt/IFrP8LsxFl7CZhC74AAAAASUVORK5CYII=", "text": "可灵 AI", description: "AI视频生成" }, // Simplified
+                         { "href": "https://jimeng.jianying.com/ai-tool/home/?utm_medium=baiduads&utm_source=pinzhuan&utm_campaign=title", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAABpUlEQVQ4ja2SP0hbURjFz3fvtZHni4SAf4giFUFpXESFTg5ViCCCYB1EEIe6OTgKdU23uuriJjgqDkINFhV0MNEkCIpOVm0kRogkRmN9efc6JDYvJoKDZ7nD/Z3755wPKBQR3lk8uzCCAia6HWXELm5MRkq9YmDPTwGARy09P2foupQKnLNXLBbVu/BgTK39+lnlsOfOYYw4J8ZKf67ig9g4PNlUanF/r6vXY+O8mCnw2biYDe6vtbgViWaBVHAvGQrRdbytseHs6GjG6yUiYTVoesW5s+rYELH4P385d7g7azo6awlXUgbHxgDkkyDOAbR7POMZWXf52HRw1xhOfjxV9VHTubQCt/s/mbtBSQng8+RkOGNSyiCpiQzSO9sp38KdbxXRCDGWZQSy9Sr17fu0ra8vcg8bl2m/73Z5QSYT+pfBFPeBcjQAwRiTUo6Mjn794Z3+G71f3zDWf5Np11qH9PaBxNZ8JvIHlO9ESKUA7PoDB/39h4GAisV4tauye5jbXWYMD+FQcZgvcs7vOXq82qcRwDIQFowsdRJYicreICoxTk/pQ5hoz/DfdwAAAABJRU5ErkJggg==", "text": "即梦AI", description: "一站式AI创作" }, // Simplified
+                         { "href": "https://hailuoai.com/video/create", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACsklEQVQ4jWWTTYiVBRSGn/Pde+feSWd0ZMohI4OQEvMnhoSIaCH9QLSINrWIAkOkoKW0MFqHQdSi2pgU9LsI0Y2Wg9vQrDFIJrMaZhBCbRTndmfmu993nhaOWngOhwOH9z3wHs4LgLpFPaIuqGnWad3XrNPMtOprXaeay5ij6haWyZvVGa9FbV3ldeQtVVWp1svYGXVzqMeAHWCJtowi4uIpOf0lnpsKui0YHTcefQ7vvT9QI6IPDADfhboItkjDoog4uVeP7wtaDxBrtmu3iT/9Gku/z1G8sNvWrp0RqVGEECXXNafqib3p24301Ke3yCgPH86L23bk1Q++SNVcvgnWVWZqXprUfc3Mkwes1frvv6y/3m/54XuWJ35Qdf7ghDMPvZKLU7OqmVWdTTQoIE5/po1NwfjLMn0mfOtV6l6DfnuM3kcHae/exfDu57n81WTMT0zZvu+uQGlSNATw3JmI2x8xw+Djd6lmLlOuH4eNDzKwdQVXDhyj88RjtLdvtffHPwEYjYICIAC6LVwagJT+9AXKzp2Us1e4+vkE3LGW2LiVhclpWL2GKm+7RjMoyDqEYHRcv/85KArqe7axeL5H32H6jkCrQzG2jvkf55j/pRusXINIklEQISAPPxvVb5esDh2is2cPzSefIlePMfTS07Q2bmBhukf3bG3vT2VoxCCICJsUDcjEDZvwxdfpvvmO7cvJ8BuvsbKqo5y9yoX9p6hyBblqNCxXmTEQIkHQBMqIaJFJe+dOyqUOc+9/E/nJCRhZ59KVBlVnNBxaa700TFW1GVw/aBCKZajfAo8DJdoiIsqz5+0en6I3uxg5sIpsDVE3VkIxaOfuDmPPjPQbgzGgTvzPTKl1VstfuRx5o1/LmxNn1c38x85Hb9i5zsyq1sw0M7POmxvSBdMj1+38L1DCUwPgk0C+AAAAAElFTkSuQmCC", "text": "海螺视频", description: "AI视频创作" }, // Simplified
+                         { "href": "https://ai.kezhan365.com/microvideo/", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACBUlEQVQ4jcXSv2oUURQG8O+7M3PvkD9kIAqmCGw6O9decPIEbmElyG7AxkKygtgm25jSpBNESOEDrI1tNk/gYiN2G7AQJObOZNfZ2dl7j4XZkESx1FMeOD/OOXzA/y5ebazuTFrwgIdDVKH36RVQwaWjUAYrXxZ7fwWuv5zUTYEPygMiAMDuxzfhRlmV38tQWCrVH4levz2gnc2oi0BQqc1o4iAegBDiJV1rAbnGYaYJq+XWcG6yeXHmEhBNXTpXOASVzJBkgVXzeF461gBZTNoY7T8Cqy+mDT32NV14WRxWvwAPyJSNcRj3M01rNZBpJq/vFOnvG4hrmrGDKT2W8qoNAUQIEaYP7mPpxKj9TBOZAbIw2LoE1HaKmi59w4y9xKXjcBGHXqn+7Bf84VuZwTtrgEwrOY2ZtlNJzoGgQqrHDvTg0cq8/XwzOTi9xroIIF4AQftJL+plWg2sATNDFIlvngN0sjnxEY6WF/Bt2SQCJOUSxZNnZyC58UzSLOa+jSAnEZDH0gAAVdsuatUwqufQcDyLhWAgRMdF7EIA8YRTuJdD7eUxaQ3FGqbpI0kVbLBVjsKz4ADi0R4/5tr0ITuh5VMIB+IF9NLq1oA8wHZuSKuJXOGucscRIOiB6MGjNXrOvdmHv+5ygAnXAbUrYD8E6u/fBp1h4DeGEbq5Qf1qtP99/QRrkf0shOwPvAAAAABJRU5ErkJggg==", "text": "万彩AI", description: "AI生成视频" }, // Simplified
+                         { "href": "https://www.vidu.cn/create/character2video", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAC0ElEQVQ4jU3TT4jUdRzG8ffz+f2Z2ZnZnc3NinB2qShYkcQgrUXIAg+CiVFIFkRBl64ReqwOEURFdIkiyEOH8pYE4npYu5RFxoJFpYK1Vouyrq2rjjM7v+/TQY197s9zel4C6pGve52IF23fESADksSq2LaABJZ0gZQOpMFfb2aRr3tLke3HbulmcXXZNpJQlonIBQZ7WJFtlYZLRdFZBNpgK8szFCYl7EoYbm25v2zTQzEi8rKSLcOSouhYwiiUetdsrkg0iVoTO4GBakA5tZPobKB/7Eun+VOibBonKSs6yZLcv+7WI5tV37aD5elpej99R9SapN4SjWf3UX9+P9WFZQaXu3Tf3WPP/ybldRO1iQRrPbp1R3rw7IInjs17/Pu+hx7da6ntfHS9xw523Xj6bUtr3HznvMunPkpiyFG/N4UiBF3au3bq2txF/tz2AN1vv2H4pdewr5BvmALl9Ga+QFkdV+BL/whyZCuwgWD55FmqcgzVWix//gnZ5EPkd26k2Pg4g7O/khZPk01ug9ptpJ+nkRrgiiAlpCaXvz5MFQ1a2/dw/cQ0ceoPmhufINZPsfLDEUyX2LSbNHeStHAGihrYBDaq1RhcmqM7c5TGk3uBLlc/2E917Qox1qF//BChMWJyO9XsIaCPFCARliwbUXr54AGKTVuob36GpV9myHe/wuD0LNXCOcoXPoSsTjX7FYqWnRK2TVZ2UhQdRzmRxFqPvPy+7zqy4tsPLnn04zkP3b/L9+w745FP7WzLqw7WOGoTKSs6zspOUhTjRraQjO1+V+WGKeLu++gdP0xNDdoPP8fi70dZOXeCKBs3WAhjSVF0LgJtbBSRIdm9q5gVKW8BkAb/EmpYZQNsOaWKGxe/nDna7Yh4DAjAAimvScUQQkhBFMMoy2VbN3WFFJFcvZeR8h9FMUIwbmjplkDQKsv/czZY4jxV+szV32/8Bx2MXWtBGUNqAAAAAElFTkSuQmCC", "text": "Vidu AI", description: "参考生视频" }, // Simplified
+                         { "href": "https://www.runninghub.cn/?utm_source=kol01-RH096", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACOklEQVQ4jXWTMYyMURSFv/P+md/OmMjGsoVsRLNEVIRkqXWyjQY1hY1kg0avUSA0lAoitCqFQqMkChQrYsXKruwashg7M///3lH8M3ZDvOa83Pveeeeed6/4+PAkmW5orT+ODdECA6gCQEDIjABsJNzIl4m+IObvfwGNqSgSCnKrgSSIUdQynIxixGt9KyUIAZzsej2Av9ZUxjHsRMhErw+PXuB+KTbl8L0D9RoeH4X9k3KrYTpdyIJUlgmztWZIQiILuNOF87dEtzBHD4jpI3DxNsQE+3aZK2fEgUnrZ0WCSEHJQSBSkiTRahhJNEfQ7HG4frby4c0Hcfqq+bQi1zMRk7BDIAQbjFRhsrDBxgvLcGwK9u4ECVZWxYOnptW0bSsEB2yp8nmIA+cH2zyHyQmwq9j7RRGjBHJKCvy97HUOgJSgvbqeG90MQdhVpf8SDF8uI962BeY+wvO36/npw1CUaEBS+6+CvAavP8DMTegV0NwEl07B1D7U6Vb9ANSQ7MElb1DOUhvuPYFWo4qOtuDQHhTkjUoDKVXmDc3MggmCsS1wbQZmj1eHF9tw4rI9tyCP5CJGYSs4KBlMCLZtfnZFsumX0OvBtx/DssyPNXHnsWmOVF8elKS3dw3rrexnr6DTExPb0dRePL8EL99BPYMymh3b4eBuVBRGCmL+fhu0deMwIaGiEJ0u5HXcyJFCpaMs0a/ucJjaNbLsHJluEOM4trXa0Z+myTIoIup1QCADQXYWIM8+E33hN5DAKFQ1Gq6yAAAAAElFTkSuQmCC", "text": "RunningHub", description: "云端ComfyUI" }, // Simplified
+                         { "href": "https://chatglm.cn/video?lang=zh", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACgUlEQVQ4jW2TTUhUURTH/+e+r5l586FjmqmUq6BFkImEOI2vNn1sisAMIhBcBRGJtBdauMjahBAJYYVEtGnVKkgZzEK0wZbSTgNBtNEZn/Pm3ntazAc2zIGzOfzv4Z5zfn+gYbAoZ6P6/2E2FpEGAHhsRtR2K0tX+Es/tgCS9Wqqe0wAcSS922MazpiAugEjGgczoINdhnya+xqdrOrqGpSLTd7BOAtzSqvgUGv9QSksCtLCNG1POOE7OshP783HHlT1lREmBEA65uWnFNnjJpdmOo6HPjUlDMcWkEzYWGinmciXvWXbcZ+5F4uvChlaA5ioOnN8MD9Gpvv8WCLYbEvaSjNaWMOt/ZERSMWZ35vS48B/tJeJTwMQAiAd8vxuZjxJJoC2pB2SEm9kgKtFhS7lozU4LPUAeAhCp2lZhjANGyDGUOUKli4NO27MTUaR9SVuZ2dpvW7Z2wCybiq3b9qhubYW59SZET67NEu/BACw5vO2pbWlMZqdpXX0slVhgeBV9tTLEcu2J2XJX2iOmx1K4DEAlMEwyJKHJb30Dj/hsYkYGB4EQIx5kuj6Fk4kDuZgWCcLBXmfGDFmPlFrYArOSMMxO6/lhzFPspYAmtL76cTpvlUynJv5nf3LA+daNiD4kgB9r5JIf7k40xwc3PVF9H00nRsAxBZY2yAjJWGkoLBSLOT6+3qTBclYIaYdX+FlBaQyEN3X8+2SrGkl7FsKgJKAxQEiYbGYjInPli3SMHBFS6yVSri3+rbGwREWAbowwikmPaq1GDQNbhaCDKXhELCqgRfLr2nuKLl1KANVxvvHOBxso7UYFK2/2vmz8ZH8hoZr7MaJBlYGMMRGfekfioUe6npJVvoAAAAASUVORK5CYII=", "text": "智谱清言", description: "视频生成" },
+                         { "href": "https://video.hunyuan.tencent.com/", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAADKElEQVQ4jU2TS2icVRiG3/c75/z//DPTJiG11HQsWQgtiNe20kUx1Y0LF6KioIgIolXBtRQU4koURLuQplShO0u7CFqwoIiJNxKxSCOIRaylTqq5NJfJzOS/nHM+F63Sd/cuHp7VQ1wfASgAnPzo0wdu23X7841681BQbYHCEND+7WJn6tyXv348eeap725meONg78je+sQnZ97ZMjh0OKs3XVEW8DFqjAoxhlk9w+zMajU7u3Ds/aPPHQHO9wHAjI+rPHKqWT/y2LuTo6Otp/N+ybLMfYyBGiNBhfdBFWUY2ZEaoyMHWiMP7f/zytpkr/d4MFNTb+mbOz98L1safGZ5YbnItjvDSEOQFIAESBIKaTQN1hZ7ZSo7dg827tj609yTn/Oz134/kNnk26osSaMcfWKIte0OoYi47gdChCY1QWPA4fxXlXbWNP4y57G++c+Y1aLxctDEVlG9QMU6AVVBKoWiGgER5cA2p51loNoAaw5osmaV2160ea82VmwGrUonex51aNwiKHuRBNU40G0xqDWMRgXbF4KaQESlsKg0jcmY3diwO0NOjNwlbN1PlH1FklKZgNJ0AInukrL9s2p3HkgzorsRGbsR1qJlc0/40mJkf4AwwqZEdxG4Oke4OlHliqKniJGwjrAEulcVkgskA8Q7aXMAGLhVVUjkK4ofj5f86/uoVSegXFcYFTUCOkvk1xSrl6CZJEh9Oi+5DdOx7ihGozHA5a8LIK/U2IK+77U5rOqyyDSF5otAexZgwZgxow2Ytt5VJwqvzxY5EXqq/YWC9SEietVrFwM3VxyMs9pfJdbagHqrqQhReW/gJuSNU8M/rBVhon1l0KYuVrRBXeKR1Dyc87q5UOj65U3kKwXShtdaPa+2bW0YJ+HYq+eSGQOMSz+9dzpjue+e+4Z368q6dpbLaGukiFIcYBKodTFQogw1hl0Rul9ot/fS3X80w/8xAWfrJz548O2De8pX1md6rtsrEGPUGASqhpYZfIUqVMnx+b8vvX747L7+f0neqJIKAKdPdw7eifyFpQsbh8qqakFFhUlbg53yPp58+Oiub25m/gWZ/qqVn1SCjgAAAABJRU5ErkJggg==", "text": "腾讯混元AI视频", description: "视频生成" }
+                     ],
+                     "去除水印": [
+                          { "href": "https://image.baidu.com/search/index?tn=baiduimage&ipn=r&ct=201326592&cl=2&lm=-1&st=-1&fm=detail&fr=baiduimageedit&hs=0&xthttps=111110&sf=1&fmq=1713767239197_R&pv=&ic=0&nc=1&z=&se=&showtab=0&fb=0&width=&height=&face=0&istype=2&ie=utf-8&word=bdaitpzs%E7%99%BE%E5%BA%A6AI%E5%9B%BE%E7%89%87%E5%8A%A9%E6%89%8Bbdaitpzs&oq=%E5%9B%BE%E7%89%87&rsp=-1&lid=10069686546447852841&toolType=3", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAADCklEQVQ4jXWTTWhUdxTFz/3/33w2CdNMQkMaqfmAGqziIiRtESutkqKgmEUJootSKF0I4kK3ChoUa6ltLWiRbrqsUlsrWlMVP6K2BCtBtDZ+JdFM6ryYmHHezHsv754uEo2bXjhwuPdyFgd+INlNMkcympFyRqTqnOfsZu6POZLdIOnOniKSOjEZ6ZZted25x6WqMjcW8tNNYzxwcEJnMl+EkKSLWRP5gep0RN23/4lW1V1hdt4d9l3x+MXX40xnB1nffI/nL3o6Pa0ahnMhBoCSkHhMxBrI4N1AMhnLRELwKBfCdSNkaywI4fBIKNaKOA6EhABQo6pGhPLTLwUc/fkZutZWUEQlU2XR0ZZCR3sKnqdoabayZHGCh76fRP81HyIUVTUgqRf7PK1ruqfVDXf15OkCb94q88FQ8KK6a9dLfJwPuXOPSyczqG8vH9G8GypJNQDk+kBZrIFUVYqcu1BC64IEnhUVm7fmsb3HRUtTDLU1FuculNDc6EhuLJTb/wQCQBySaG9LIpEAxp8o3luawtBwgM41oyiVCWuBP/t9HP+xHu1tSXz5zQSWvpNC64I4lAqJoojGCK78UYYfEIsWxrG6axRNjTEYI+i7WkLgEx91VaBnRxanz5SwZHEc89+IQRUQVaUqYa3B8EiI9R+PYWg4xA+HX8NfAz6+/W4Kla8YeCXFyg/S2L+3Fo4VRJHCGIEhhdYa/n074IrVo1z1YRqXfm/AorcSKEwRh76qRUWFYN/uGjwYCrFq3SgLBaUxhoDQqKoAlAMHJyWdhmz6LMNlnQ9x7HgRmVcNkklB3lWEIfB6XYyXLnvSe7YoIpQoUjHGGAUArww+nSLv3w9l765arnw/Bb9MKIHPe7J4tyNJpYq1loUCCQggojIdkdZAfz1ZlI2f/IuGBgdda9JiLXCq10MsZtC5IgXPI44cK9IY4MTRejTOj5GEEZIugCyg6D1b5onfiggDoKXZkdY34/B9YuCGj4ePIlZXW2zorsTCVkcAAwDjeI7zDI0vo/t/o8/JzZHs/g8akjdG32H2lQAAAABJRU5ErkJggg==", "text": "百度AI图片助手", description: "AI照片编辑器" }, // Simplified
+                          { "href": "https://www.shuiyinyun.com/tools/#/editor/videoToText", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACKUlEQVQ4jY2TXWjNcRjHP8//Zec4duYl5S1hY6Uj7lxw4SWllKFMlNxRDmU3Yjts/zGWXGgXI8oIN0yJKDTlLaTOxVrjYmtiFxppdszs7Pz/v8fF2Tk7rRnfy9/v+/0+T8/zfYRJoUIlFjGUToQYiidmcs2Y2PqraQFkwk8PwRPDIV1MlN2EKMfwGaWVU9KR5YkWGORcs48AxHUHUa4QpYQ0MBUYAUaookGaciZS6MYRncM0QnxiPmHaCPMVlwMM8I7ZLMfQRJiVDLKJBnmCp1a28jFdQoSz+GzHRRgGfDIMspFmeZHvKqELmMJ7Al5SJ5tBRUjoQkI8xaWMNHfx6cZlNRHW8JsWOtifN2iVAE+foSzlAYvYQuBgcw6HMgbZxWm5BUCl2qzgOBnzDSyYgcVlyWTHxVyEFEnJkATB0xHgFZ5s+OdmE1rFTM5bKb/aqNMOhB1sXAK+jM6ilDBxfCJofsUGMLjEKGY9Kd6aLucRy3hOhj6hVruxKUEpJSCGyxv8cfkQQPmJzc1tH3/UZMrbL7U5a3em+1knnNA9FHODIV7jcxSfAYooIkCxUQIEG+U7XVyoHwLP9F1fdfFO/9b0wcOJqmylWq0mxBls4FculKOVDYqLWH5w1Ri7Ih69dq951r5eevzb0sgHB1Q4KY3U6GMcKhDmYQCroH1Qg/0QpWfYWEnUHbg/fW8vtOSSq+Nu4v8xJvTUAiw60QmZ+ZOuV63zVCTL+wM7kdMrCEkI9QAAAABJRU5ErkJggg==", "text": "水印云", description: "视频转文字" } // Simplified
+                     ],
+                      "数字人": [
+                         { "href": "https://www.heygen.com/?sid=rewardful&via=startp&gad_source=1&gbraid=0AAAAAq3VV6ZAiWVd-ErfIyX6bgh5LITzU&gclid=EAIaIQobChMI6722vuixjAMVXF4PAh01xChoEAAYASAAEgJZjfD_BwE", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABsElEQVQ4jXWTMa9MURSFv73PnRlGY0LEX1AQRIJE+ANaoVXRacav0Kn4C5qnewmiEBRINK9QKET1ImKi4Bnvnr0U55777sx7TnJzb845e+211l7X7t/UjTTiYc6cAJAwM4z/rzADd761f7nXYDyWmAGxXiyBrUFJuESYcdKcR27OLGcEOGCAAMxLsbQKYIbM8JwRxswjkBkmITMUgbW7sPOrwLkXkApU37XGK2UzrN3FZsfh9hwuXIXlb1j+AU8DNl1hZdQMqJEzHD0Gpy+W5+xleL4BXz7BeALNCCJKs9q0B6iGRUBuiwdnLsGp8/D2GbzYgJ8/4NAUFHvm+pBBXd4ZmNvS9dp1mD+Ac1dguVPO+7sHDVoH7FUf1g9XJPTfAZYgNdC28HoTXj4tEibT3of9JkqFXup2t97B5hP4+hnG46J/WAzQdPM3CaWELb7D1nv48Ao+vimXp0cK84guaoNl81uKDoAapMjFwMnhbjIq2juWGgapGaTQqgR3GI2LpJ5yV1wzICF3zBGLlDCJFYI1vkO9tpfCSAlTsHAFdzG2u9nHir79f6LMegnbiDv/AIgZxtQPs5XzAAAAAElFTkSuQmCC", "text": "HeyGen", description: "AI Video Generator" }, // Simplified
+                         { "href": "https://zenvideo.qq.com/", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACMklEQVQ4ja2Tv2tUQRDHP7P77u4lJmBEhIhYWARFtBAVRESusVH8URyCiDaCKP4DipAXWxsrk0iSSixygohgsBJsImKhYmJMEIwIQkhyYs67vHtvdyzemdyl1WmGnZ35zsx3vwv/aNJ6uHBNe/J1FKDRaL/L57O4tZjRUSogug5QUnt1K08UjqmSoFgAaUKorrVzRigIvJn/yqmJCYkDUKGMynXqYYHNtVqWa8x6sTGZV4UgB6ljS1cXCiomG0X80H05v7rKHWtBDKSqThWv4FXxqjggcZ5G4rhRLkuDLHXdhgelP3WcDTzfC4lYJ5rtmDnN58n5hAdjwzIJKiC+DaA0rnZkWJ5OH/xQ+rFzMQ6rYrxRPOqNYF3KfMXR3yxWgKAVoFwaUAWR0+8vGZnNHX28v7rvdV9XEqozIZL85mZ5VJZBDdDyChlbgojyrXyCwLygETsKMX1v++rFiSObTFWeDe4aOAf9EIn/W9YygcDCeBcNfw9UcajUQjt7+HO43FvVHVO9Y1yOPC+PB8AaQMaBRgZBifU2HYU91BspFqtWVaqhWdy+wLuTM0PMP7pIsZi2K1Ejg0SeLw8P0Vl4RZwEWby5kqrgjcdKQBiAcpeZj7coRmkTAGE6ytG9e5KOwgGqNbBmo8rB+0xJ23qgsvKcuU9nKEZpgKDMLQmGCvX4F2JiVA2KIKogTYJREMfSSh4jObp7ZeNnEqZGeui0GUEr9fYRujuUn0DeGfZeWeZ/2R+yy/uwwpCIBQAAAABJRU5ErkJggg==", "text": "腾讯智影", description: "在线智能视频创作" }
+                     ],
+                     "音频": [
+                          { "href": "https://hailuoai.com/audio", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACU0lEQVQ4jX2TS2teZRSFn3U8uTQ1UdS0okFJgkK9tIo4Ctgq4mWoOPb/OPIP2IkzLzPRplalYBUjaCmlxEuMTY1JG5Pil8R8SfOd93Fw0ppM3PDChnevDWuzHgDUE+pZtauWUiylp6Uc7NWibqnT6tPsiY+ri6oWm9JYvDN78LV/Nra1oDtPRv0SeAm4ZaEvldm+GVevwPoSscDhB/HoCTh0n7HEVOwC/cCZqDtAbSGpzPJM/P0LUg+1wtLA34uk24HHXsPxk3eWqHRroA8wlVmaiXOfwMTrODYFQGiNMn8+XvoASomTLxpLSMVQrZCQ7lqY+wwefZWMTcHOJiz9ANubcORYmDhFej24+KGMPhGHjxiNlYUAuX4JM0gemcL1ZbjwLvxyDv78Eb56B2an4fGXpRoKV78jSbCQKkHAmwvk7ocxFZn9FDrLkEG4dwLGT8HFj6GzFO6flJV5VEmwYq+aBpoCCp0lSD9srMLsORgYhkMPwPJPUA/GnS2StBeqtLUwMoY3fiaJjIxB5y/YvQXdfyAV9A/D/Ixcu0yqPoRAIVWq1sJDz5LNNbxyJjz/Nky+APVheOZNuGcMbszBH5fDym9oRWh3WCeAOHLUHH8rfPMedtdboZK1a/D1adnegnoQSGh299SQGtgl1JZ47BXT68Vv3yfffwT1AG6sAnclqaHqYncDRsf3wiFbUc8DJ/dHuXM9/noBVq62UW5nwSaOjsNzb9jrG0gfcPY2iYuqpdg0/wOTB1hyQX2KfTh/vh/npqel2cO5+a9vGrulOH1b/C9pzeOBoV9wngAAAABJRU5ErkJggg==", "text": "海螺语音", description: "让文字栩栩如“声”" }, // Simplified
+                         { "href": "https://ttsmaker.cn/", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACBElEQVQ4jaWRXUiTYRiGr2+bn3NbzSmLGoWtJZEWQpmFBztoMOsgAtGUCKUCD4JYHexAYgd6akE/WFBQSSFEkDsoKgs0WxGVVB4YQsV+TMof0Frp/L59byftr1KU7rP3fZ774n6eB/5T0mJFe1m9JY/ZIvlnfDwc7p9bMqDaW1t30GPwuxy6SpsF3cQMyvtIsv96r9o+/KwntCjgyNG6zkCTfMxR/Dd7OKxpbTcSJ4K37lxI/emzGzz7alvOH89vX23LNX+dnMNiMmAvlKTyEn1NX8TVNxUbiQLosvpMjbv1Abs116xpgurG+3yZmAWgbL1O1+yRT6XqaYBsWeWv2KBfm3pHx35wwPeE0OA4RVaZnkfRNHSjQ+dOjZ9JkFSaTUaJqekEgbNvOdz6HCGg9cwbLrXtoiv4ifbOIYSAfBkj21sMAIZUACXx3flhNIl3h8yh/U5aGkrRNGg4OUDllmJun3Mzr2hIEkxOizCDl5VsgCo0de5aMGrcu9PFJqc1HSzUXQPAujVmAOZV6H2tdv25Aw0YuPvgHVfvxXOWaDBkphQCOrrjo6ERpeNfZ4wJTW16+PSz9E21UVFqxlyQucjHMQ3f6QhXbr70z8SGXrCAfEASEAUr7aKqqlzs8W4TWys2izxToQAuLmTMlht4DCiA+D3eK6B+KeZsFQAlwIrlGpelX4yQsBR8J3BTAAAAAElFTkSuQmCC", "text": "TTSMaker", description: "在线免费文字转语音" }, // Simplified
+                         { "href": "https://noiz.ai/landing", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAYUlEQVQ4jWNgGPKAkYGBgeFHk/N/mABH3V5GfBrQ1TLR2IGEASMDAwPD+0IXuLME+/cwovORNaDLDRIv3I3QhDtLecV1FCejy6HzB4kXzthIwp1lcuQ53oSErnbgvUAxAABJTSgNZQWOOwAAAABJRU5ErkJggg==", "text": "Noiz AI", description: "免费AI配音" }, // Simplified
+                         { "href": "https://peiyin.xunfei.cn/make", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAChUlEQVQ4jY2TS0iUURiG3+87//nn4kwXL5RgjXZbONVCZiACIVtEmwoDC4kgiSYQCiqyRUQ/iFQSrdrYotoZtYqiTUFKFgQJBUkE4SXRvGfMOOP0z3++FuMl0S7f8vC973le3nMIf5qE6EhkohgIYsANjsIhs9IaLTupE1UeT59kYJ+YXAhCWVKWgbaf9J6z7v7FQAgOAhWhzHUiVMHIqIAnyXOLoaxatv0wbra9923vCTyqdAESAOAFMUjKC7It5JntyHkfiNQuxWgg21cLELKpmXoAh8vjFc15sdBvBiSFzmQZi0kIxE/KPg5jCo1rPpGFbgGdGbwcfgDBgGI+X+KMrV8kqHuoACCkea8Y96PAwBjzTHzuTjv2tebLWV+s76L/NiAEljayOBMIhqoBAI4wo65ujkFWwXgeREb6mgL1sUYu3VG95c3B8elTcF5aAEkymbojhqcs8UoAAD0gxhEIAIjWI1C2n5VaBwjclKxlbW0jVnGUhgkipFlvhUjEE9MHAIhCGMj3myHqImCalHIjLenG1Wu6O2e+53Y/LgoncDrmgkg4wLYg158cGnudj0CGlrTQmqpn5hts+TZkkrMHhq4UPC279aPQRuAmhG0ib7Mnblv/hdB9zF2+0AIg1N8UajdCV8nGZ23nc1LOjhKpBhVQxyRnOvJiZ4F8+UsEUNac3KP9Ok5ENcRURcYLGfEGk1JQM95EI/PESw0cYThkylvTR62g/57M/vwG5nfi/nxvtH/Yc7M9g5eC3fPC+bEWDfJIU2n3eZGt95PnVgr5oqT0Ia05qki9AKj2H58pj7bx2uwmHaBOydEExHSATddM0ns16oTHVoq8fBxhJIaD/7P6C3//FTDK4v5mAAAAAElFTkSuQmCC", "text": "讯飞配音", description: "在线制作配音" },
+                         { "href": "https://app.dubbingx.com/tts", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACb0lEQVQ4ja2Ty0tUcRTHP+c3V73jC19oRY6lREUUBRUkBC5aZBEl0VgaLaInRCT9Ad0etEgDIUgiqkUSpQghFAZCViAKJUUpZIZpUGYqJuP4mHvvaTEZBrYI+q4Oh/P4nscXFoCC6D4Ccdsxyr7AQnELQkH+xf+HU0uwpA1XK7PSieafYyy0muFQhO+Z9TJyqVlBGmkwYcLeXI75TdnBSBuubiGIbbVgvGXE3FpUH6N2jZprVQI6Pzne1YkXAdAajqhDpx5Pvz8/ZoqLy9XcGppMa314PL/tcnXek5Q4ezUCoE0sZRKHUTYyisMYrXKdyJ87uLv9RzAz7fXinIovKSlUvF1bBiD6jDDTOIzQyzBnpIpPAFpKEuO7HYaWdEt/Xf38YnfWv+sdyMrt60vgtEUCV4lxVCppAdCz5JBMAa83pJIwuxfP3hSl7ulEekF+3sSOzvNowEy82jaVbQ5KMHhPtJ3PFBMSUACtpYZh2UtvURPfVub5A4VqBtfN9Gcv2/kywz4c/ri1ZY7JgbLIiIXSwRNuqk8zSbynG4NrurDcQtRMi5okiNnjxn1jezOhij2zmwvHhjLEsk8NqnlhGOMkMdoJsoYp6lGWoAi+8RD/16GNn+j6sankzNJFM9HqGSuQnRCb7uj7PnnIkl2MALcB9AG52GQRkR4C7lo8g/rerAQSNS3mPVI7vTz1x+iVC+1Fj+bGsAC0gQA9qJRTBaCn/BMYqwQz22z8xAINxIoyI1Fnf9eKGwAOarpBGhHPApAw3txHCijqN+JKNslf7xEtXqUSCaVx7APsB1QcxF9IF/8XWoKlIHE5N/xVzj8BLqT/xc+TAvoAAAAASUVORK5CYII=", "text": "DubbingX", description: "配音工具" },
+                         { "href": "https://www.tukuppt.com/index/aigc?scene=89&type=0&timbre=11", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACiklEQVQ4jYWT3UuTYRjGf8/eTZkfWHOOxFxzissWGIgd7CAXkiRSHnkQthM7CDxJ8B/QP2DkiSeKHpgIuliUQhD4MUOdQokJEuqJg3REjKGY5va+dydz+QVd8Jw83Nf93M91XTf8gwK0np4ek4goroCIaIApc7KkswVKKSWAs6mxqb3B33A/L996fWt7+/vY2NjHZDL5/kzNuZfJhxvAa7fLNTwzPf1TLiAej0t3d/cn4E2uxfLqUgNNqbf24mJZX1+XaDQq4XA49fvoKG0YRnphcTEVDof1dDotXV1dAkhubu6jbIPMn98NDgykgsHgMaADRl9fn7G/v28ABmDU1tamdnZ2Tqqrq0+Ax6daaQA+ny/wbW3NANJKKb2trU36+/slFotJa2urVFRUCKAPDg7K6OjoFmAWEbNpYmICAG+Nt8bpdOLz+QwRUaWlpZSXl7O8vIzf7wcQm81GfX29OBwOB2ADdPPGxoYCODg8sBRdu6YikYgsLS2Rn5cnf05OWFlZUc3NzeL1elVlZSVut1uFQqGcsyKaAG6VlbVsbW6eU35mZkaCwaDEYrHTK0NEpLe3dwEwZXIBImICVGdnZyiZTF508BympqaO7Xa7PyOgKRukTEBMDx80jLQ8ffLM4/HoNptNs1qtJBIJ2d3dVZG5yNHQ8FAzMH/KM2e9VEr8d/zW2fm5ez/ie0YgEFAul4uCggK1t7dHNBrVR0ZGLBpU6vA5kx/jXNY9dk+hUmpzcvLDlePf9ngEeJkp165aFgXcrKur+zI+Pi7xeFxPJBLydXU1/aKjQzRNe37Vkl1yBLgL/CoqLEyV2EsOLZpZgNn/kbNNREQV5OTUAI1APdBeVVVVcnF7Af4CYalvtln8jGwAAAAASUVORK5CYII=", "text": "熊猫办公AI", description: "AI写作助手" } // Simplified
+                     ],
+                     "地址解析": [
+                         { "href": "https://greenvideo.cc/", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAACj0lEQVQ4jU2QS0hUYRiGv8t/js5YpqZGWdHNC0IYDZVFkhTtWhRBSBRFUCupNm1atahVmy4QUkQQpUQbqUWIoUYodqHsIk2YY7nQnErRccY585//+1oMSe/iXT3v4n1QRBBRVQEAEdMueP0n0f/n2xLjp2y2qbymqbwWEAgQ84SqLtLdU8MXPj3K2GAuzBqkrLMbiir79140yJAnAIyqOpXA2fMfOp5ODkXZUwBVDdQxUXx+4tVMYvfymlCcAQJEE4p4zG2jve3jA+uLKmdy6ZWRktaNOwwbRvodzD38MbitZL1BVgAEQFV9O/29ZfCWT5wM5g5Vxa42tJR4UfiXGZspNoWMpKqIaKy4ayNdKbcQhYKDVVvbYicY2UoIgPlBqRfN/0QEADCzucyH2fEoF3pIN7YcY2Qn4pFZNLHYokKIpmN8cCbIAGLzimpGciL0n+U5u0BIqmqIIuyrqslITlQDsc2V9QXs5VxIyALKSGffP+hODhebiKhkXO5+45nYsnUUYZ8II+z1TcUDFzKSU2GkrslPt0Z7fmZn46mJRPrXryB15fMT65w5uqbxdqIv7YL+6RGroSFfRQGgwHiXNx+Osm+QrbpLw53lhcWpcAFzLjz15u7z5HAhewdWNNyMHRdVJ85jk7cUijs79LDEj+6rqPeZySM+V73fICHgs6mP1+PdoJCnQ3Fj6d8D09+aymtKTbRz4t2Oso1oXWiIe5JfTr6+Q4SpXPZgVayueNXO0k0NpavbEr0FbO6NvVwbKXu8q9Ugo4g4FUPcl4yfG3owbdOhSja0ZX7RUhP5Oj+JAEdWb7+3/TSoKiiqKig4FSaazWXuJl60Jwbm2VpxPpqWtY3NFbV7KupEBQAJ8S/ED1vkzko6gAAAAABJRU5ErkJggg==", "text": "GreenVideo", description: "免费视频下载" } // Simplified
+                     ],
+                     "视频总结": [
+                         { "href": "https://bibigpt.co/", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACFUlEQVQ4jV2TzY5UNxCFv2P7dtPdQpPJZJRZAMor5UHZgPIqZJNFFvxESATE0N33x1WHxe0ZISxZsuU6p6qs+vT3x/Gl039G7wYkyXYWED8vibQR4FqbJL/Wm/9OzojLgwCDkfHD7UcLlwKZIOHWWmmx9EQSgG3SxheVBcWmlIcKRCaUAjbqvWdjrVmZphZxvROHwVQnSzdfO9wvldUjBauJAJVCExDg/abw7Kqwq4YeIgOX5GbofBK8X/YIuUiPbdmm9UhtmnhxBQOdGAMw6YS+oL5wO50hJt61X4XXjhMoQDNwd4BtJtE7JsGJ5hlNI0wLMQY30z2fr3ecNzsqRhI2tN0AT0sQsWYmFpgmOI9w7HgMmJN6mrnS/xzvnlMyURoDbZARC85Eva/i44iOHc4B5w5zwmmhbib0u1EE0QbkRP+8/+I/diNeFpgnOM2UbzP+1vEp0WmBHhQn592At6Jp4tNvd3y8fUZbEtwv4nGCacFj4nOAOt4syEH0ypN5PXsT3H34l+P+KW1y9f1cuJ7P8jRbU8djl/cdsaDThJ3IBfKJSaMAFyhinYN3cVB4ZmCUa8ChoxbrH2wTaoc9kINQhRp8vf6F4+HKrci2Km+3t2i74mBbYISwYB0dIck88iFKhFutQ8mMVKYk4XwAwSDxCMZF9BCjguswlCLpVa1VSL7wbKSVGAlUfthrDAXXNoiiv74DKURjpLMM0HgAAAAASUVORK5CYII=", "text": "BibiGPT", description: "音视频内容AI总结" }, // Simplified
+                         { "href": "https://tongyi.aliyun.com/efficiency/home", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAC+0lEQVQ4jQXBvWudZRwG4Pv+PR/vez5jvjgpJtrBDqapQgqmCqIgIkQRBNHFxcVBnBS7OXWwfqD+AQ46KAUnQTqI1kXqYBtw0KElGIcGjyY2Juack/M+z3N7XQSA9Xd3z+c4994k+8cz4WMWAwyBhBUhlMIKplAKqsKmG/VjGB1c/PzS4k2ef//O+jgsXi0IA53kYhArGpgMLhX0HeAFVCJCEaoEdSozh2Y4He9u+pHNfyyGgU7yNAjBg0ACluoJFrrgcN8jmlO7CBGEA4hJmVYhDFq29JEhxQuc5hLB0CXZhsOMEj98mfzsjagnH8wq4xE7TAw5ySWxlRXiJJdeEx7j2uVcDEJVCDbC0b/C25vAq085piSMTxKGd6U6GP45yPjiS0DjgIpCLQcfBbRlyKPCp9ca3T+X+cAAANrwHuh5h17HCBDLA4cb90106xex3XIKGfCdLLoEnOonXXze2GlV+Pb6Ib75boxe20MSSiP0+xmT46I/bgXORJNPhVUhfK0ib4bpsbjzp2n1NLjxUBvvfDDF4YFDlLDUbfDa6w517Xj7RtFf25mdyhQEWCsT/SxyVOvK1cTJJGGm6/HKC4a52GA+Frz0omF5OWJhocIzz3l0fUadDN1CWCuDIVGzUdzdNeztSaUI62crnFnOWDnVYPVhj5wFAJi/1zhbm+pGrLPoI0wVxTySzp0FV1YcAcDMcGEjo90x0IDJIbC91WD/tlQOHHseioXw7UwEUQzC/u/U9q8ZswvA8ZFgMJ5ZbYEkfrs21dZXxGzf4x5H+UREAr4uSA50NUCMHK98itIJjZ38V7C2YTr3CLG3k7j9Q+FgvlUiZD5R3qAoJN/y0+s1qydsjGkkQnBkbCr1nTD8ufDrnQY4yqqbgEAwylQVNX3PmDj5ycCjtyqkYScw1tnUS0SrABWALk35TlQ8qtCFRycBdYbmjNExDadx+KZdvrR4s7iDzWjpWhdKTkSA4FEYCtAKQG3GSkBNqlWQ4NL3d93fzz76yemt/wE/gm5HWr4d8AAAAABJRU5ErkJggg==", "text": "通义效率", description: "工作学习助手" } // Simplified
+                     ],
+                     "Hugging Face": [
+                         { "href": "https://huggingface.co/models", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACp0lEQVQ4jXWTXWjNcRzGP7//+//MWfbGsR00WpO3YZElF8I01oQ7uVBqF+6s5IJYriiuvJf3ckFKEZFQFjK00iYyu/B22DjnbDv/s/P2/39dHCTse/l8n57n6dvzhXFHVEunlLYdlPD4HFB/A6ceSGX70s/r+Xy3ldzHWjAgVNdPzdrrJ247N7a3qsS4arFhWRIMHH0mz5eJdFeLdFeIdFeKPK0RedEs8unqo7efZNF/E3z4IvOiib23SJ6M4upg2CC/WAL5DGRMZPLegV7Vvm5+rXoNoAFsPSdO1Dt/gOEzUSY4BMpGfAERQPALgO5ASFBDh2bMC3Xtb2wX87fA4U0s5Pu1NVh5AlHsPlXN2ZuVYAq5vKLjyFSu3C8D2wD1DWKX2y7sYQGAAVCe7W5CvdMxHVQAqxaPMLM6C77C0IUtzXFMQ8AXsF0o9NpzJiUWAc80ADKxCKRBaSgdmuZ6pLMaeR8yeUXICWioS0OgQNNBhiE7FPmdADcSxzdhNAGuiZey2HU8yvRSn9SYjjMxz7EdA+gAY2NgTQU7EgcwHvdJOd7F1SSGwchAwqPK1ti3sQS3K4pf6hNaG0OPJyEnYCpIDyLxrrbHfXJJDcZleVX/poekboPh/rw8oAUQngiaQCIJyijulIJcCio20x85u8KoKhmpIRgC3QRNgWWBqUMyBdkxCAREg1IX8gXIFcCwoPCV2iqmGOiOj+VANgd2CFyr6OIa4I0WXcNhsIyisAIKo2C55HzEeJOwHtVP6biHVrGSXA94SYoVnAYlMwNQELzRSMWKtVFlUNYM1dvuvR/hoQLovCITOlpZHU4/b8Z7Oxu/YFKx+Ml7f9Y1CjBN9Wxg9GUTupsnXP8q6TTcPd3FnZ1rlPfvRzWKSYvY/+AtYtNYrO+f8wNmYBZLKqvBZAAAAABJRU5ErkJggg==", "text": "Models", description: "Hugging Face Models" },
+                         { "href": "https://huggingface.co/", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACp0lEQVQ4jXWTXWjNcRzGP7//+//MWfbGsR00WpO3YZElF8I01oQ7uVBqF+6s5IJYriiuvJf3ckFKEZFQFjK00iYyu/B22DjnbDv/s/P2/39dHCTse/l8n57n6dvzhXFHVEunlLYdlPD4HFB/A6ceSGX70s/r+Xy3ldzHWjAgVNdPzdrrJ247N7a3qsS4arFhWRIMHH0mz5eJdFeLdFeIdFeKPK0RedEs8unqo7efZNF/E3z4IvOiib23SJ6M4upg2CC/WAL5DGRMZPLegV7Vvm5+rXoNoAFsPSdO1Dt/gOEzUSY4BMpGfAERQPALgO5ASFBDh2bMC3Xtb2wX87fA4U0s5Pu1NVh5AlHsPlXN2ZuVYAq5vKLjyFSu3C8D2wD1DWKX2y7sYQGAAVCe7W5CvdMxHVQAqxaPMLM6C77C0IUtzXFMQ8AXsF0o9NpzJiUWAc80ADKxCKRBaSgdmuZ6pLMaeR8yeUXICWioS0OgQNNBhiE7FPmdADcSxzdhNAGuiZey2HU8yvRSn9SYjjMxz7EdA+gAY2NgTQU7EgcwHvdJOd7F1SSGwchAwqPK1ti3sQS3K4pf6hNaG0OPJyEnYCpIDyLxrrbHfXJJDcZleVX/poekboPh/rw8oAUQngiaQCIJyijulIJcCio20x85u8KoKhmpIRgC3QRNgWWBqUMyBdkxCAREg1IX8gXIFcCwoPCV2iqmGOiOj+VANgd2CFyr6OIa4I0WXcNhsIyisAIKo2C55HzEeJOwHtVP6biHVrGSXA94SYoVnAYlMwNQELzRSMWKtVFlUNYM1dvuvR/hoQLovCITOlpZHU4/b8Z7Oxu/YFKx+Ml7f9Y1CjBN9Wxg9GUTupsnXP8q6TTcPd3FnZ1rlPfvRzWKSYvY/+AtYtNYrO+f8wNmYBZLKqvBZAAAAABJRU5ErkJggg==", "text": "Hugging Face", description: "AI社区" }, // Simplified
+                         { "href": "https://lmarena.ai/", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACHElEQVQ4jYWTTUhUURiGn3PPnXtn/GPMmBIsd5HgwnUukoLCXNSmha3bBIIutISEDFSMomzRH4G7grTFOEGrQFdCFJjE7IIUopioHJ0ZZ+bOPfdrYfmTNz3b8/58vN/7wR5PptAyhd4LE068uJskghWGtXeAwFIQqGnMbAd2ezc9OJjIMg+UIhBQCCiF7HYd3nIojdIV3CctzxFJIsFLFitJzoZNo7aLeAO0icOYc5jOwJCpwOUgjutW88RK0OAVSRFjyD3Jx78cCyA7SH15kHFLM28pTvsr3ChkabXjuJEcK1+FY36eca3p1Bbz5XeMrCwQ38wgZjjjNHCNHHg5BtU55mKrJHWMdhxoXCLlLzOgzlN0qripE1yXX7wFXikA6cAuHac70shdmqnjII424P1kUuVZi0Tp86oI7CaMOGRMnH6nhWmlCGwB9ekp+kiBhKwRpYITfEP0OkrK5FQtUL+Rliyh+Aw6g/B4Iz9LgRwtcME9xB3bpcb43GaBVrPKazdBb+QAfcZjRqppqXxgRAc06WZelK/StZmBU+aN94VbVpleW9Ejp1hfK3Cp7gcndC1+Ps376igDqoZ+UyFvskwUisztXuMsbcpjzI7SKRkypRxX9Dq2bXhkQYP/nVRQZMi9t7XG0Kr6M3SZKdKSROQZEkywWBndVqTh8Frv+JBh7NIk/d5D+uRPXwSU/DN1uFDIBf7XdT+h/c75N/Ll3m7XwKXzAAAAAElFTkSuQmCC", "text": "Chatbot Arena", description: "AI Chatbot 对比测试" }, // Simplified
+                         { "href": "https://huggingface.co/spaces/Vchitect/VBench_Leaderboard", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACp0lEQVQ4jXWTXWjNcRzGP7//+//MWfbGsR00WpO3YZElF8I01oQ7uVBqF+6s5IJYriiuvJf3ckFKEZFQFjK00iYyu/B22DjnbDv/s/P2/39dHCTse/l8n57n6dvzhXFHVEunlLYdlPD4HFB/A6ceSGX70s/r+Xy3ldzHWjAgVNdPzdrrJ247N7a3qsS4arFhWRIMHH0mz5eJdFeLdFeIdFeKPK0RedEs8unqo7efZNF/E3z4IvOiib23SJ6M4upg2CC/WAL5DGRMZPLegV7Vvm5+rXoNoAFsPSdO1Dt/gOEzUSY4BMpGfAERQPALgO5ASFBDh2bMC3Xtb2wX87fA4U0s5Pu1NVh5AlHsPlXN2ZuVYAq5vKLjyFSu3C8D2wD1DWKX2y7sYQGAAVCe7W5CvdMxHVQAqxaPMLM6C77C0IUtzXFMQ8AXsF0o9NpzJiUWAc80ADKxCKRBaSgdmuZ6pLMaeR8yeUXICWioS0OgQNNBhiE7FPmdADcSxzdhNAGuiZey2HU8yvRSn9SYjjMxz7EdA+gAY2NgTQU7EgcwHvdJOd7F1SSGwchAwqPK1ti3sQS3K4pf6hNaG0OPJyEnYCpIDyLxrrbHfXJJDcZleVX/poekboPh/rw8oAUQngiaQCIJyijulIJcCio20x85u8KoKhmpIRgC3QRNgWWBqUMyBdkxCAREg1IX8gXIFcCwoPCV2iqmGOiOj+VANgd2CFyr6OIa4I0WXcNhsIyisAIKo2C55HzEeJOwHtVP6biHVrGSXA94SYoVnAYlMwNQELzRSMWKtVFlUNYM1dvuvR/hoQLovCITOlpZHU4/b8Z7Oxu/YFKx+Ml7f9Y1CjBN9Wxg9GUTupsnXP8q6TTcPd3FnZ1rlPfvRzWKSYvY/+AtYtNYrO+f8wNmYBZLKqvBZAAAAABJRU5ErkJggg==", "text": "VBench Leaderboard", description: "视频生成模型排行榜" }
+                     ],
+                     "其他工具": [
+					     { "href": "https://www.google.com/", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACIklEQVQ4jYWSS0iUURTHf/fe8RvHooE2VlT2FNqUGWmNEYUR9lhEEVJhUIsoXOQuap1Rq6KHNQt3LaPAIOxhlNTChUwLMU3NR1CklUzg6xvPd1ro2KhTHjjcA/e8/uf/hzmmqsUiEheRLhHxp/2TiDxQ1aK5+ZmFeSJSrwuYiMRVNZKuMxnFz51zu9T3GX/6iPGmRqS/F5WAUMEawuUVRI5UYjwPEWl2zlUYY8YMgIjUW2vPBkPfSV6uYbKvJ+uW3rZSojfuABAEQdw5d96oajHQqr7P8IUqpL8X43lEjp3EK4mBtfgt75l4+4po7U3cytWZPbcyjUlTidv642ipDu7foX7bh2zgs92jDhHpUlWdbNmuEw15OvqweqE7ZjboCAEFADrSjs1LkRM7NAt3+bWRebfYudFx9XguwFqbwePs9z/mT/6NLdAHMBpex28W0/C1Y1Zy05VFM75nUwiAZVGT/v5sgdcA3UurOPUrxvXOFhJD7fOmdn4LeNc5NbpkfWimv5mWZ8KXFKdfXqInOYBnc6gsPEjZ8mKssbQOtvEkMczYl0oK8z3un4lgppbYkhZS3Fp7bnD0Jxeba+lODmTFviFcxq29NeRHDUEQ1DnnqtNSjohIo3Nutx+keNz9gmf9zfQkB0ChYMkK9q2KcaLwMJFQGFV9Y4w5YIwZzyBBI2lRLcD9PVXN/SdFqlokInUi0iEiE9P+UUTuqurmufl/AKTzsFGmvUNUAAAAAElFTkSuQmCC", "text": "Google", description: "搜索引擎" }, 
+                         { "href": "https://github.com/", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACpklEQVQ4jW2SQWucVRSGn3Pu/WYmTUnJJDVSsKnxa5O0FMFNK9SFexHElQu7EN0oCt0ILQquxIUi2Fqx+gcERXFbUaqrCorFWDuJTDKWNEQbO5bWJN/ce46LTOgQ+q7OhXPPy/ucI2xJAAeYLGceD6F4UeFJhwfBRZAVQ741S58sLVy9zIBkoC6mZo6+I/CyqDZwx90dQEQEEdx83d3Ptlu/ngZse4BCWUzNND6PsXjKzGDr38D8e28NSkq9L9rX5p4DcgB8anrfe7Va7WRK6Zvs+Q1BxlVkr7mtOHRFpHD8ck75NO67arX60yOj4/Vba39dlAPl7PEQ46UQi5B61cft1twrQDx06NGJqvp3DSDX683rrdZNoJqaPvp+LIpXc+5tpl4+ETWEl0S15pYRSEAA8vz8leUBPjf6eYLgycyCiO5StRdUhCdwdzNf3+ilD4Hcbx4EvF3nRO88lu/g7iJyQh3ZJ4iA/73cvrbYb7QBctsUHaDTav3pcEMEBHlYAfEt7MPNZjm0w3mnZGJiouEw4i6CEFSEDu6IyNjuseJY3yneJ0IEvL5n7LiKPNC/kY6S7QdUAblbxPjp5MGDs2zB3Bkh7S8PHylCOAsgKuLu38tkOftYjPEnc/9ARR7SEJ4xy19ZtrcW53+7ArC/PHykKOLr7v6sigwDyd0t53xMO3/8/rO7fRRDeK2qqrctp3dxdv+3mW7fs682BE6qyLA76xpCdOzc0sLVXxTQdt485WaX6o36Z+b2o5udWe20tjfC9ZSWzX0VIIQwlFP6up02zwA6AOpA45HpkQsa9XnLxtrG7dHu0lIXoFmWI6NxqCui2SxfaLfmTgEV/avrU+6mW2urX+4Z3/uduN9cydVFut0EsP5Pk9Gxop6Tv7m4MHd+4Nj4HxrWR3D6SUWaAAAAAElFTkSuQmCC", "text": "GitHub", description: "代码托管与协作" },
+                         { "href": "https://yansd666.top/", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAACMElEQVQ4jVWRy2oUYRSEq/5zume6M5lkNF5gclE0JqIg7l25deHT+E4+hBHBlYggohiiJEoUx5iZMc4l3f1fjgsN6LcsqEXVxxRTImjmSMAMBEDCAOIvZ6mZUedm3xr4mPoZSTqBGCwlA9NZgQRhBqoznQR7d1xdP9ceN2lnWKdMt9Ru5PSOmZCkGSIhjodVPEzUw3m4UMhGBovcLKSO6WImi2XWJGtgTUIuXBQKravsJuiRt5sd3T2ufR1WS13p5Y24QcDBPL0dVrNoC8q1UjYK6SrvLYgKmTtc7GS+1FxYGT5NgmUuCbaX8yst0qElrnA48elrAz4bVkdVfDKo7y5nb36Ffot703h7OZ8mg0FSurWk+7PUVb4YNQ9XCwXwauyHdXw9tr1pGLWcBz9MwzRaKVhWPv/hx03steTraexlTucRIeF6R9cL2ezIacRhbSttpsruX26XhG9SMp0nnMvcWikazR7d6CyqK+WvqC8eTYYZ0AI2/9F3GuIoQqNZoc6Pjx/v7HQWOqv9/nBSfZhMQ56H74NiMtq4ds3RbW9t9ddWLUS92hZxGFf1aDje+7jvjbm4wfvdrF30zM98M/s1OTg4uHRhZX19zQE8qUI3A5zgHyqgBpbwH9OYRhH6cjD/HPDgcvt8zqeD6gt4p6MIKTmeBGupOREnLoEghNReW3c9fkZrpnFYh7HTlnC9zAB4A92fzQbnlHAAY0yRoJkZDCCp/PMMQYMZeNYxAvgNQR4oV78VshEAAAAASUVORK5CYII=", "text": "烟神殿AI中转站", description: "API中转" },
+                         { "href": "https://hzh.sealos.run/signin", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACYklEQVQ4jaWTXWjOcRTHP+f3f9v/P7NmSyZRXBEadrNWmoQbhRQm5cbNROwCCXku5EKaWrmTG0T2KGW3Y1fK24WsXY1deAt7efbyPHv+r8fFM0tsufC9Op3v6XvqfL8HfkdODf+L4LluYlD3gsr84irzL3qoVsvT9NLKdxo6A9pVmf1DZB7Yv4qDMnm94Cw+PW6gJiYbq7QFUFBp78k6XNvsiQxFk3Hz3j7pAzAA525/21WLdcqaihNvUstOyisA+iv87nx2nBpzE5udTsC+2Ofx0V7dMidQXU4P11mBeEkifkgUFBkGoI0UIBY9EKZkpVjDeErDMGBRQTgIYLo6n/vVcdIsU4VPfpxGi3xZ7Bu2AtBTWRArk2VBQtRKFWsmQycc1gEYWel7TpZe0a8f1tuqJ7xyqlVJthFVaRvsF4AZ0aHIQKRoRCYlQaZtagHszs5NBeD+7C1vb380NWzXB028we/PbZsBKKNLrAxxJZNMRAseSpmR2RuonL2rKwByOTV9+2uevWyzbtBLBOiqO8XGENlRSlTjFPPdFUarkJLwdtZGUc/VuvMPtCl3SHq1Yh2Sk2T5Ew1MKepObLsxDuN0wkKG6o1oSDHLyM/6rAKiF++llweSZM3j6Zm7xMmEE1StrXHlmFflt7ppmBrf0i9LLQkbjMU4F2iRq6jKXNK6u9X72JDdGnLNkYEwZQzBGHBNnFiBZY8usym6QEQXzZwBFJG/o3otr+2fDSe/Gd086Yg37cGYTTRi8+KH0J22Sv73+QWyrtKRZ0PBY/WYg44mvH+9Wwb+9Rf8cmJBUv/mfgIDShLSbo+T3QAAAABJRU5ErkJggg==", "text": "Sealos Cloud", description: "云操作系统" },
+                         { "href": "https://cloud.megaease.cn/megacloud/app/login", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAsUlEQVQ4jWNgGJ5A2Wl/N7rYhAX3FmNTy4RNkJGBoQRD8D9jDFEGqDjt/48u1jv7tgUDAwPDhPn3MeSwugDdIGYWluO41KEYoOy4fzs2Rf8ZEc6fOP9+PU4DGBkZPNBcUc/AwMBQmKCwFG4YA0MDVgMUHLZKYLG8AYsYdi+wMHE9x6ewIFGREcZGDkysgXhnnyNcMbZYwXCBstP+7zCBj/8YePGoPwBj9C+4h5HYhigAAMDtLYFjOJ2HAAAAAElFTkSuQmCC", "text": "MegaEase Cloud", description: "云平台" },
+                         { "href": "https://cephalon.cloud/aigc", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABsElEQVQ4ja2Tu4oiURCGv2O3Nt4QTDrxAczswGBzA59ApE1NfYcRTAzFJzARjKQjn0EjE2HAUUNNvaIN7qkNptvL4MwGuwUFRdX/V51T5z8Av4B34DdwBXTg8sXD/DXAvgdcPgLAI/mnBmETAT7UQ1Fxt8f40eRLHIl8Q5ZvyApAKRXi9BM4FouRSCTkcrko3/dJJpMYhoHv+/i+TyqVEq21Op1Ot64G8AaQzWZpNpu0Wi2ltcZxHHq9HpVKBdM0KRQK9Pt9VSgUZDKZcDgcgg6GIYC0221pNBqSyWTEsizpdDpSr9cFEMuypNvtiuu6ksvlZDgcCiBKKTHDo5imyfl8ZrfbAXA8HqlWqySTSbrdLvv9nlqtRj6fZzAYfC5FBDNYCKZporW+3S0SibBer1kul7fc6XRiOp3ied4dJ/K5w81mg23bOI6DbdvE43EWiwWz2Qzbtkmn04xGIzzPIxqN3pcoIm8A4/GYYrGI67rqer0yn88pl8uUSiW01qxWK7bbLavVSkSEcPCrN5e/COmpZv4gJKWUuk16ID+p8b9IeQGEkn4FfJXTAWfBv37nP3Hn4cJlLw+kAAAAAElFTkSuQmCC", "text": "Cephalon Cloud", description: "端脑云AIGC" }, // Simplified
+                         { "href": "https://www.meoai.net/", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAADBklEQVQ4jX2T34tUZRjHv8/7nnNmpjnjjM6e2XF16IfN4rZlkmYaYYoshBcq1XSRV3XRL/Cqm5ZIrP4AaWWDCImiC9lu6kpYgsVAMPzVrhC7bRzLLJ2ZdmfWOWfnnDPv+z5dDJkK+Vw9X3i+PA883w9wTzFD3O4BYoBu6xrkvfN3m6fg3HcAwHIN+Tu1YO5viH+unFTbKmeT2XU7AYDfgM1fIcvH4F7YBhsAwrcLh1zPuxC9Nvj5vxf2zf6mjxybP4BJwJ0YSFbnEEQedbTNbRCviATt9LJoO6MIbSCyEYX4OHPqr6NW4/LGqurSEJHehY4aobZ+HKyXRUxSh3DRA0GhZQJlM9mnWalZactfYle+1XjVq4qMkz5sr7HGdISUs+XmF/BtIW95LwRzA6eRDG8na3gD8gMz1t7SQdqRbmU+a30dv5fNPvBhbl/m3fxhiheqlwxjaxwnm/ILv18LNgwWU5yZllkqxM3CuCW0I4vBJyZQ56wb3ZfxTbMbvVOuIO/60qKfaPVK9W8y6Fz/c3FzdT9iAOCG5/Ya+R9JsibCGqPJ//axX8deIWgAWJxAqrL9kXkWlBNIGFBMVqb/jRnAolIzWEqCPUbKtRpiqY2VAzUCM/o5aCoITlggMhCk2ReKy2U8VAaA544/f1RP7D25/qmbTdOl3b2e2l8abQbq07EzamL3PgDYNTo0IBIehGLfUqGZdkvW02HIzwL4jYcP+CJDEfMMES1cBYCZPbDElpdmBYkGT/7gRqEcS3siFSz1pmn1zFBF6NR5YQBKYQ49/b21eO04vYneXSn9MleM7dy4EmmSQj9jOTzS08GTwgqoKBPO6dDMmw5fNrcwEmUGNzIz8ftHdvKxIzsAIDLui9w1m53U2nVW4cGLHKnvOEmVBccmRsJ/UM88TIE5SIaXW369jhMnHJS8rSiWRrk2JdPmximhxUWuX88ofzGLRDhSUocAgCc9V613ngjbql54ve7fD6aVSe9Rm8lLOvF8YXylhTtxRR/n//Cdqkmu1f4XYQboH3gJaAPeywlaAAAAAElFTkSuQmCC", "text": "MeoAI", description: "AI工具导航" }, // Simplified
+                         { "href": "https://www.runninghub.cn/", "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACOklEQVQ4jXWTMYyMURSFv/P+md/OmMjGsoVsRLNEVIRkqXWyjQY1hY1kg0avUSA0lAoitCqFQqMkChQrYsXKruwashg7M///3lH8M3ZDvOa83Pveeeeed6/4+PAkmW5orT+ODdECA6gCQEDIjABsJNzIl4m+IObvfwGNqSgSCnKrgSSIUdQynIxixGt9KyUIAZzsej2Av9ZUxjHsRMhErw+PXuB+KTbl8L0D9RoeH4X9k3KrYTpdyIJUlgmztWZIQiILuNOF87dEtzBHD4jpI3DxNsQE+3aZK2fEgUnrZ0WCSEHJQSBSkiTRahhJNEfQ7HG4frby4c0Hcfqq+bQi1zMRk7BDIAQbjFRhsrDBxgvLcGwK9u4ECVZWxYOnptW0bSsEB2yp8nmIA+cH2zyHyQmwq9j7RRGjBHJKCvy97HUOgJSgvbqeG90MQdhVpf8SDF8uI962BeY+wvO36/npw1CUaEBS+6+CvAavP8DMTegV0NwEl07B1D7U6Vb9ANSQ7MElb1DOUhvuPYFWo4qOtuDQHhTkjUoDKVXmDc3MggmCsS1wbQZmj1eHF9tw4rI9tyCP5CJGYSs4KBlMCLZtfnZFsumX0OvBtx/DssyPNXHnsWmOVF8elKS3dw3rrexnr6DTExPb0dRePL8EL99BPYMymh3b4eBuVBRGCmL+fhu0deMwIaGiEJ0u5HXcyJFCpaMs0a/ucJjaNbLsHJluEOM4trXa0Z+myTIoIup1QCADQXYWIM8+E33hN5DAKFQ1Gq6yAAAAAElFTkSuQmCC", "text": "RunningHub", description: "在线AI应用创作" } // Simplified
+                     ]
+                 }
+             },
+             // Removed categories are completely gone
+         };
+
+         // --- DOM Elements ---
+         const categoryNav = document.querySelector('.category-nav');
+         const contentPanelsContainer = document.querySelector('.content-panels');
+         const themeToggle = document.getElementById('checkbox');
+
+         // --- Helper Function to Create Link Card ---
+         function createLinkCardElement(link) {
+             // ... (Function remains the same as previous response) ...
+             const card = document.createElement('a'); // Make the whole card clickable
+             card.className = 'link-card';
+             card.href = link.href;
+             card.target = '_blank';
+             card.rel = 'noopener noreferrer';
+             card.title = `${link.text}${link.description ? ' - ' + link.description : ''}`; // Add tooltip
+
+             const iconContainer = document.createElement('div');
+             iconContainer.className = 'card-icon-container';
+
+             const fallbackIcon = document.createElement('span');
+             fallbackIcon.className = 'card-icon-default';
+
+             if (link.icon) {
+                 const icon = document.createElement('img');
+                 icon.className = 'card-icon';
+                 icon.src = link.icon;
+                 icon.alt = ""; // Decorative
+                 icon.onerror = function() {
+                     if (icon.parentNode === iconContainer) {
+                        iconContainer.replaceChild(fallbackIcon, icon);
+                     }
+                 };
+                 iconContainer.appendChild(icon);
+             } else {
+                 iconContainer.appendChild(fallbackIcon);
+             }
+
+             card.appendChild(iconContainer);
+
+             const textContent = document.createElement('div');
+             textContent.className = 'card-text-content';
+
+             const title = document.createElement('span');
+             title.className = 'card-title';
+             title.textContent = link.text;
+             textContent.appendChild(title);
+
+             if (link.description) {
+                 const description = document.createElement('span');
+                 description.className = 'card-description';
+                 description.textContent = link.description;
+                 textContent.appendChild(description);
+             }
+
+             card.appendChild(textContent);
+
+             return card;
+         }
+
+         // --- Helper Function to Create Panel Content (Grid) ---
+         function createPanelContent(items) {
+            // ... (Function remains the same as previous response) ...
+             const grid = document.createElement('div');
+             grid.className = 'content-grid';
+             if (items && items.length > 0) {
+                items.forEach(link => {
+                    grid.appendChild(createLinkCardElement(link));
                 });
-            });
-            
-            // 滚动动画
-            const categories = document.querySelectorAll('.tab-content');
-            
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.opacity = '1';
-                        entry.target.style.transform = 'translateY(0)';
-                    }
-                });
-            }, { threshold: 0.1 });
-            
-            categories.forEach(category => {
-                category.style.opacity = '0';
-                category.style.transform = 'translateY(20px)';
-                category.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                observer.observe(category);
-            });
-            
-            // 夜间模式切换
-            const themeToggle = document.getElementById('theme-toggle');
-            const themeIcon = themeToggle.querySelector('i');
-            
-            // 检查本地存储中的主题设置
-            const currentTheme = localStorage.getItem('theme');
-            if (currentTheme === 'dark') {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                themeIcon.classList.remove('fa-moon');
-                themeIcon.classList.add('fa-sun');
+             } else {
+                 grid.innerHTML = "<p style='text-align: center; color: var(--text-secondary); padding: 20px;'>此分类下暂无书签</p>"; // Placeholder if empty
+             }
+             return grid;
+         }
+
+        // --- Function to Build UI ---
+        function buildUI(data) {
+            let isFirstCategory = true;
+
+            // Determine the initial category name dynamically
+            let firstCategoryName = Object.keys(data)[0];
+            if (data["书签栏"] && data["书签栏"].links && data["书签栏"].links.length > 0) {
+                 firstCategoryName = "书签栏"; // Prioritize bookmark bar links if present
+            } else if (data["书签栏"] && data["书签栏"].folders && Object.keys(data["书签栏"].folders).length > 0) {
+                 firstCategoryName = Object.keys(data["书签栏"].folders).sort()[0]; // Or first folder in bookmark bar
+            } else if (!firstCategoryName && Object.keys(data).length > 0) {
+                 firstCategoryName = Object.keys(data).sort()[0]; // Fallback to first available category
             }
-            
-            themeToggle.addEventListener('click', () => {
-                const currentTheme = document.documentElement.getAttribute('data-theme');
-                
-                if (currentTheme === 'dark') {
-                    document.documentElement.removeAttribute('data-theme');
-                    themeIcon.classList.remove('fa-sun');
-                    themeIcon.classList.add('fa-moon');
-                    localStorage.setItem('theme', 'light');
-                } else {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                    themeIcon.classList.remove('fa-moon');
-                    themeIcon.classList.add('fa-sun');
-                    localStorage.setItem('theme', 'dark');
+
+
+            // Process Bookmarks Bar first if it exists
+            if (data["书签栏"]) {
+                const bookmarkBarData = data["书签栏"];
+
+                 // Add '书签栏' main tab ONLY if it has direct links
+                 if (bookmarkBarData.links && bookmarkBarData.links.length > 0) {
+                     addCategory("书签栏", bookmarkBarData.links, "书签栏" === firstCategoryName);
+                 }
+
+
+                // Add folders under Bookmarks Bar as categories
+                if (bookmarkBarData.folders) {
+                    const sortedFolderNames = Object.keys(bookmarkBarData.folders);
+
+                    sortedFolderNames.forEach((folderName) => {
+                         if (bookmarkBarData.folders[folderName]) { // Check if folder exists (wasn't deleted)
+                             addCategory(folderName, bookmarkBarData.folders[folderName], folderName === firstCategoryName);
+                         }
+                    });
                 }
-            });
+            }
+
+            // Process any other top-level categories that weren't deleted
+            Object.entries(data).forEach(([categoryName, categoryData]) => {
+                 if (categoryName !== "书签栏") {
+                     const links = categoryData.links || [];
+                     const folders = categoryData.folders || {};
+                     if(links.length > 0 || Object.keys(folders).length > 0) {
+                        // Pass both links and folders if structure allows (though current structure expects links only at this level)
+                        addCategory(categoryName, links, categoryName === firstCategoryName);
+                     }
+                 }
+             });
+
+             // Add click listeners to generated buttons
+             addTabSwitchingLogic();
+        }
+
+        // --- Helper to add category button and panel ---
+        function addCategory(categoryName, links, makeActive) {
+             // Create Category Button
+             const button = document.createElement('button');
+             button.className = 'category-button';
+             const panelId = `panel-${categoryName.replace(/\s+/g, '-')}`;
+             button.dataset.target = panelId;
+
+             // Add Icon to Button
+             const catIcon = document.createElement('img');
+             catIcon.className = 'cat-icon';
+             catIcon.src = categoryIcons[categoryName] || categoryIcons["其他工具"] || defaultBookmarkFavicon;
+             catIcon.alt = "";
+             button.appendChild(catIcon);
+
+             // Add Text to Button
+             const buttonText = document.createTextNode(categoryName);
+             button.appendChild(buttonText);
+
+             categoryNav.appendChild(button);
+
+             // Create Panel
+             const panel = document.createElement('div');
+             panel.className = 'panel';
+             panel.id = panelId;
+             panel.appendChild(createPanelContent(links));
+             contentPanelsContainer.appendChild(panel);
+
+             // Activate first category (based on dynamic determination)
+             if (makeActive) {
+                 button.classList.add('active');
+                 panel.classList.add('active');
+             }
+        }
+
+         // --- Add event listeners for tab switching ---
+         function addTabSwitchingLogic() {
+            // ... (Function remains the same as previous response) ...
+             categoryNav.querySelectorAll('.category-button').forEach(button => {
+                 button.addEventListener('click', (e) => {
+                     e.preventDefault();
+
+                     categoryNav.querySelectorAll('.category-button').forEach(btn => btn.classList.remove('active'));
+                     contentPanelsContainer.querySelectorAll('.panel').forEach(pnl => pnl.classList.remove('active'));
+
+                     button.classList.add('active');
+                     const targetPanelId = button.dataset.target;
+                     const targetPanel = document.getElementById(targetPanelId);
+                     if (targetPanel) {
+                         targetPanel.classList.add('active');
+                     }
+                 });
+             });
+         }
+
+
+        // Theme Toggle Logic
+        function applyTheme(isDark) {
+            // ... (Function remains the same as previous response) ...
+            if (isDark) {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+        }
+
+        themeToggle.addEventListener('change', () => {
+            // ... (Function remains the same as previous response) ...
+            const isDark = themeToggle.checked;
+            applyTheme(isDark);
+            localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
         });
+
+        // Check for saved theme preference on load
+        const savedTheme = localStorage.getItem('darkMode');
+        // ... (Code remains the same as previous response) ...
+        if (savedTheme === 'enabled') {
+            themeToggle.checked = true;
+            applyTheme(true);
+        } else {
+            themeToggle.checked = false;
+            applyTheme(false);
+        }
+
+
+        // Initial UI Build
+        buildUI(bookmarksData);
+
     </script>
+
 </body>
 </html>
